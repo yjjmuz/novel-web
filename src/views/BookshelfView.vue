@@ -4,11 +4,11 @@
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 border-b border-gray-50">
       <div class="flex items-center justify-between mb-2">
         <button class="p-1">
-          <X class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
         </button>
         <h1 class="text-xl font-bold text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
-          <MoreHorizontal class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
         </button>
       </div>
 
@@ -18,22 +18,24 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-6">
               <button 
-                class="text-2xl font-bold transition-all"
+                class="flex items-center gap-1 text-2xl font-bold transition-all"
                 :class="activeTab === 'bookshelf' ? 'text-[#1A1A1A]' : 'text-gray-400 text-lg'"
                 @click="activeTab = 'bookshelf'"
               >
+                <img :src="activeTab === 'bookshelf' ? '/input_file_20.png' : '/input_file_38.png'" class="w-6 h-6 object-contain" alt="bookshelf" />
                 书架
               </button>
               <button 
-                class="text-2xl font-bold transition-all"
+                class="flex items-center gap-1 text-2xl font-bold transition-all"
                 :class="activeTab === 'history' ? 'text-[#1A1A1A]' : 'text-gray-400 text-lg'"
                 @click="activeTab = 'history'"
               >
+                <img :src="activeTab === 'history' ? '/input_file_46.png' : '/input_file_45.png'" class="w-6 h-6 object-contain" alt="history" />
                 浏览历史
               </button>
             </div>
             <div class="flex items-center gap-4">
-              <Search class="w-6 h-6 text-gray-600 cursor-pointer active:opacity-70" @click="$emit('search')" />
+              <img src="/input_file_15.png" class="w-6 h-6 object-contain cursor-pointer active:opacity-70" alt="search" @click="$emit('search')" />
               <button class="text-base text-gray-600" @click="enterEditMode">编辑</button>
             </div>
           </div>
@@ -78,7 +80,7 @@
                 class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors"
                 :class="selectedIds.includes(book.id) ? 'bg-[#7C4DFF] border-[#7C4DFF]' : 'bg-white/80 border-gray-300'"
               >
-                <Check v-if="selectedIds.includes(book.id)" class="w-3 h-3 text-white" />
+                <img v-if="selectedIds.includes(book.id)" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
               </div>
             </div>
           </div>
@@ -128,7 +130,7 @@
       class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 py-3 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors"
       @click="deleteSelected"
     >
-      <Trash2 class="w-6 h-6 text-[#7C4DFF]" />
+      <img src="/input_file_4.png" class="w-6 h-6 object-contain" alt="delete" />
       <span class="text-[10px] text-[#7C4DFF]">删除</span>
     </div>
   </div>
@@ -136,7 +138,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { X, MoreHorizontal, Search, Check, Trash2 } from 'lucide-vue-next';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
 const activeTab = ref('bookshelf');

@@ -3,11 +3,11 @@
     <!-- Header -->
     <header class="px-4 py-4 flex items-center justify-between">
       <button class="p-1" @click="$emit('back')">
-        <X class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">
-        <MoreHorizontal class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
       </button>
     </header>
 
@@ -42,7 +42,7 @@
               class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400"
               @click="showPassword = !showPassword"
             >
-              <component :is="showPassword ? Eye : EyeOff" class="w-5 h-5" />
+              <img src="/input_file_32.png" class="w-5 h-5 object-contain" alt="eye" />
             </button>
           </div>
         </div>
@@ -91,7 +91,7 @@
               class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400"
               @click="showPassword = !showPassword"
             >
-              <component :is="showPassword ? Eye : EyeOff" class="w-5 h-5" />
+              <img src="/input_file_32.png" class="w-5 h-5 object-contain" alt="eye" />
             </button>
           </div>
           <div class="relative">
@@ -104,7 +104,7 @@
               class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400"
               @click="showConfirmPassword = !showConfirmPassword"
             >
-              <component :is="showConfirmPassword ? Eye : EyeOff" class="w-5 h-5" />
+              <img src="/input_file_32.png" class="w-5 h-5 object-contain" alt="eye" />
             </button>
           </div>
         </div>
@@ -124,12 +124,12 @@
 
         <!-- Agreement -->
         <div class="mt-auto mb-8 flex items-start gap-2 px-4">
-          <button 
+            <button 
             class="mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center transition-colors"
             :class="agreed ? 'bg-[#4CAF50] border-[#4CAF50]' : 'border-gray-300'"
             @click="agreed = !agreed"
           >
-            <Check v-if="agreed" class="w-3 h-3 text-white" />
+            <img v-if="agreed" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
           </button>
           <p class="text-xs text-gray-400 leading-relaxed">
             请您阅读并同意“贵妃书斋用户协议”和“隐私政策”
@@ -142,7 +142,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { X, MoreHorizontal, Eye, EyeOff, Check } from 'lucide-vue-next';
 import { ElMessage } from 'element-plus';
 
 const emit = defineEmits(['back', 'login-success']);

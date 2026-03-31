@@ -3,18 +3,18 @@
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
       <button class="p-1">
-        <X class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">
-        <MoreHorizontal class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
       </button>
     </header>
 
     <!-- User Info Section -->
     <div class="bg-white px-4 pt-6 pb-8 relative">
       <button class="absolute top-2 right-4 p-1" @click="$emit('navigate', 'profileSettings')">
-        <Settings class="w-6 h-6 text-gray-800" />
+        <img src="/input_file_17.png" class="w-6 h-6 object-contain" alt="settings" />
       </button>
       
       <div class="flex items-center justify-between">
@@ -29,7 +29,7 @@
         </div>
         <button class="flex items-center gap-1 text-sm text-gray-400" @click="$emit('navigate', 'profileSettings')">
           个人主页
-          <ChevronRight class="w-4 h-4" />
+          <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
         </button>
       </div>
     </div>
@@ -39,7 +39,7 @@
       <div class="bg-[#F3EFFF] rounded-2xl p-5 flex items-center justify-between shadow-sm">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 bg-[#D1C4E9] rounded-xl flex items-center justify-center shadow-inner">
-            <Crown class="w-7 h-7 text-[#5E35B1]" />
+            <img src="/input_file_33.png" class="w-7 h-7 object-contain" alt="crown" />
           </div>
           <div>
             <h3 class="font-bold text-[#5E35B1] text-lg">开通贵妃会员卡</h3>
@@ -48,7 +48,7 @@
         </div>
         <button class="flex items-center gap-0.5 text-[#5E35B1] font-bold text-sm">
           立即开通
-          <ChevronRight class="w-4 h-4" />
+          <img src="/input_file_3.png" class="w-4 h-4 object-contain" alt="arrow" />
         </button>
       </div>
     </div>
@@ -60,7 +60,7 @@
           <h2 class="text-xl font-bold text-[#1A1A1A]">猜你喜欢</h2>
           <button class="flex items-center gap-0.5 text-sm text-gray-400">
             更多
-            <ChevronRight class="w-4 h-4" />
+            <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
           </button>
         </div>
 
@@ -80,10 +80,6 @@
 </template>
 
 <script setup>
-import { 
-  X, MoreHorizontal, Settings, ChevronRight, Crown
-} from 'lucide-vue-next';
-
 defineEmits(['navigate']);
 
 const recommendedBooks = [

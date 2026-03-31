@@ -7,13 +7,14 @@
       class="flex flex-col items-center gap-1 relative"
     >
       <div class="relative">
-        <component 
-          :is="item.icon" 
-          :class="['w-6 h-6', activeId === item.id ? 'text-[#7C4DFF]' : 'text-gray-400']" 
+        <img 
+          :src="activeId === item.id ? item.activeIcon : item.inactiveIcon" 
+          class="w-6 h-6 object-contain"
+          alt="nav icon"
         />
         <!-- Notification Dot -->
         <span 
-          v-if="item.id === 'bookshelf'" 
+          v-if="item.id === 'bookshelf' && activeId !== 'bookshelf'" 
           class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-orange-500 rounded-full border border-white"
         ></span>
       </div>
@@ -25,7 +26,7 @@
 </template>
 
 <script setup>
-import { Home, LayoutGrid, BookOpen, User } from 'lucide-vue-next';
+import { ref } from 'vue';
 
 defineProps({
   activeId: {
@@ -37,9 +38,29 @@ defineProps({
 defineEmits(['navigate']);
 
 const navItems = [
-  { id: 'home', name: '首页', icon: Home },
-  { id: 'category', name: '分类', icon: LayoutGrid },
-  { id: 'bookshelf', name: '书架', icon: BookOpen },
-  { id: 'profile', name: '我的', icon: User },
+  { 
+    id: 'home', 
+    name: '首页', 
+    activeIcon: '/input_file_28.png', 
+    inactiveIcon: '/home_inactive.png'
+  },
+  { 
+    id: 'category', 
+    name: '分类', 
+    activeIcon: '/input_file_7.png', 
+    inactiveIcon: '/category_inactive.png' 
+  },
+  { 
+    id: 'bookshelf', 
+    name: '书架', 
+    activeIcon: '/input_file_20.png', 
+    inactiveIcon: '/input_file_38.png' 
+  },
+  { 
+    id: 'profile', 
+    name: '我的', 
+    activeIcon: '/input_file_56.png', 
+    inactiveIcon: '/profile_inactive.png'
+  },
 ];
 </script>

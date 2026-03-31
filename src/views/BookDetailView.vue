@@ -3,11 +3,11 @@
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
       <button class="p-1" @click="$emit('back')">
-        <X class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">
-        <MoreHorizontal class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
       </button>
     </header>
 
@@ -41,7 +41,7 @@
             她却将出城的小驴车遮得严严实实，不敢让人看出心中窃喜....
           </p>
           <button class="absolute bottom-0 right-0 p-1 bg-white">
-            <ChevronDown class="w-4 h-4 text-gray-300" />
+            <img src="/input_file_1.png" class="w-4 h-4 object-contain" alt="expand" />
           </button>
         </div>
       </div>
@@ -57,7 +57,7 @@
           </div>
           <button class="flex items-center gap-0.5 text-sm text-gray-400">
             更多
-            <ChevronRight class="w-4 h-4" />
+            <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
           </button>
         </div>
 
@@ -73,11 +73,11 @@
     <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-3 flex items-center justify-between z-20">
       <div class="flex items-center gap-6">
         <button class="flex flex-col items-center gap-1">
-          <Headphones class="w-6 h-6 text-[#1A1A1A]" />
+          <img src="/input_file_54.png" class="w-6 h-6 object-contain" alt="listen" />
           <span class="text-[10px] text-[#1A1A1A]">听书</span>
         </button>
         <button class="flex flex-col items-center gap-1" @click="toggleShelf">
-          <component :is="isInShelf ? CheckSquare : Library" class="w-6 h-6 text-[#1A1A1A]" />
+          <img :src="isInShelf ? '/input_file_20.png' : '/input_file_38.png'" class="w-6 h-6 object-contain" alt="shelf" />
           <span class="text-[10px] text-[#1A1A1A]">{{ isInShelf ? '已在书架' : '加入书架' }}</span>
         </button>
       </div>
@@ -93,10 +93,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { 
-  X, MoreHorizontal, ChevronRight, ChevronDown, 
-  Headphones, Library, CheckSquare 
-} from 'lucide-vue-next';
 import { ElMessage } from 'element-plus';
 
 const isInShelf = ref(false);

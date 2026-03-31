@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-bold">{{ title }}</h2>
       <button class="text-sm text-gray-400 flex items-center gap-1">
-        更多 <ChevronRight class="w-4 h-4" />
+        更多 <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
       </button>
     </div>
     <div class="grid grid-cols-4 gap-3">
@@ -16,8 +16,6 @@
 </template>
 
 <script setup>
-import { ChevronRight } from 'lucide-vue-next';
-
 defineProps({
   title: {
     type: String,

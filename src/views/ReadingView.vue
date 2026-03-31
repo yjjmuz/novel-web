@@ -12,11 +12,11 @@
         @click.stop
       >
         <button @click="$emit('back')" class="p-1">
-          <X class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-lg font-medium text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
-          <MoreHorizontal class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
         </button>
       </header>
     </transition>
@@ -56,11 +56,11 @@
     <!-- Floating Buttons -->
     <div v-if="!showMenu" class="fixed right-4 bottom-24 flex flex-col gap-4 z-40">
       <button class="w-12 h-12 bg-white rounded-full shadow-lg flex flex-col items-center justify-center border border-gray-100 active:scale-95 transition-transform">
-        <Headphones class="w-5 h-5 text-gray-600" />
+        <img src="/input_file_54.png" class="w-5 h-5 object-contain" alt="listen" />
         <span class="text-[8px] text-gray-400">听书</span>
       </button>
       <button class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-100 active:scale-95 transition-transform">
-        <Plus class="w-6 h-6 text-gray-600" />
+        <img src="/input_file_18.png" class="w-6 h-6 object-contain" alt="add" />
       </button>
     </div>
 
@@ -142,7 +142,7 @@
             class="flex flex-col items-center gap-1"
             :class="activeSubMenu === tab.id ? 'text-[#7C4DFF]' : 'text-gray-600'"
           >
-            <component :is="tab.icon" class="w-6 h-6" />
+            <img :src="tab.icon" class="w-6 h-6 object-contain" :alt="tab.label" />
             <span class="text-[10px]">{{ tab.label }}</span>
           </button>
         </div>
@@ -161,7 +161,7 @@
                   <h3 class="text-lg font-bold text-[#1A1A1A]">苟在妖武乱世修仙</h3>
                   <p class="text-sm text-gray-400 mt-1">作者：拿钱吃饭</p>
                 </div>
-                <ChevronRight class="w-5 h-5 text-gray-300 self-center" />
+                <img src="/input_file_0.png" class="w-5 h-5 object-contain text-gray-300 self-center" alt="arrow" />
               </div>
               <div class="flex items-center justify-between">
                 <h2 class="text-xl font-bold text-[#1A1A1A]">目录 <span class="text-sm font-normal text-gray-400 ml-2">(1233章)</span></h2>
@@ -194,10 +194,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { 
-  X, MoreHorizontal, Headphones, Plus, 
-  List, Sun, Moon, Settings, ChevronRight 
-} from 'lucide-vue-next';
 
 const emit = defineEmits(['back']);
 
@@ -246,10 +242,10 @@ const pageModes = [
 ];
 
 const tabs = computed(() => [
-  { id: 'catalog', label: '目录', icon: List },
-  { id: 'brightness', label: '亮度', icon: Sun },
-  { id: 'mode', label: isDarkMode.value ? '白天' : '黑夜', icon: isDarkMode.value ? Sun : Moon },
-  { id: 'settings', label: '设置', icon: Settings },
+  { id: 'catalog', label: '目录', icon: '/input_file_39.png' },
+  { id: 'brightness', label: '亮度', icon: '/input_file_40.png' },
+  { id: 'mode', label: isDarkMode.value ? '白天' : '黑夜', icon: isDarkMode.value ? '/input_file_40.png' : '/input_file_41.png' },
+  { id: 'settings', label: '设置', icon: '/input_file_17.png' },
 ]);
 
 const allChapters = [

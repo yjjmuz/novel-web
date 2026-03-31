@@ -32,7 +32,7 @@
       </template>
       <template v-else>
         <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-          <BookOpen class="w-12 h-12 mb-2 opacity-20" />
+          <img src="/input_file_38.png" class="w-12 h-12 mb-2 opacity-20 object-contain" alt="empty" />
           <p>{{ activeTab }}频道内容正在加载中...</p>
         </div>
       </template>
@@ -42,7 +42,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { BookOpen } from 'lucide-vue-next';
 import Header from '../components/Header.vue';
 import RankingSection from '../components/RankingSection.vue';
 import HotPicksSection from '../components/HotPicksSection.vue';

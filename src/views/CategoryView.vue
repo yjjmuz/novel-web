@@ -4,11 +4,11 @@
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2">
       <div class="flex items-center justify-between mb-4">
         <button class="p-1">
-          <X class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-xl font-bold text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
-          <MoreHorizontal class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
         </button>
       </div>
     </header>
@@ -48,7 +48,6 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { X, MoreHorizontal } from 'lucide-vue-next';
 
 const activeGender = ref('女生');
 

@@ -4,18 +4,18 @@
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 border-b border-gray-100">
       <div class="flex items-center justify-between mb-4">
         <button class="p-1" @click="$emit('back')">
-          <X class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-xl font-bold text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
-          <MoreHorizontal class="w-6 h-6 text-gray-600" />
+          <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
         </button>
       </div>
       
       <!-- Search Input Area -->
       <div class="flex items-center gap-3">
         <div class="flex-1 bg-[#F5F6F7] rounded-lg flex items-center px-3 py-2">
-          <Search class="w-4 h-4 text-gray-400 mr-2" />
+          <img src="/input_file_15.png" class="w-4 h-4 object-contain mr-2" alt="search" />
           <input 
             v-model="searchText" 
             type="text" 
@@ -24,7 +24,7 @@
             @keyup.enter="handleSearch"
           />
           <button v-if="searchText" @click="searchText = ''" class="ml-2">
-            <XCircle class="w-4 h-4 text-gray-300" />
+            <img src="/input_file_37.png" class="w-4 h-4 object-contain" alt="clear" />
           </button>
         </div>
         <button class="text-sm text-gray-500" @click="handleCancel">取消</button>
@@ -90,7 +90,7 @@
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-bold">搜索历史</h2>
             <button @click="clearHistory">
-              <Trash2 class="w-5 h-5 text-gray-400" />
+              <img src="/input_file_4.png" class="w-5 h-5 object-contain" alt="delete" />
             </button>
           </div>
           <div class="flex flex-wrap gap-3">
@@ -126,7 +126,7 @@
           <div class="flex items-center justify-between mb-6">
             <h2 class="text-lg font-bold text-[#FF4D4F]">热搜作品榜</h2>
             <button class="text-sm text-gray-400 flex items-center">
-              更多 <ChevronRight class="w-4 h-4 ml-0.5" />
+              更多 <img src="/input_file_0.png" class="w-4 h-4 object-contain ml-0.5" alt="arrow" />
             </button>
           </div>
           <div class="space-y-6">
@@ -141,13 +141,13 @@
                 <span class="text-base font-medium text-gray-800 truncate max-w-[180px]">{{ item.name }}</span>
               </div>
               <div class="flex items-center gap-1 text-xs text-gray-400">
-                <Flame class="w-3 h-3 text-[#FF4D4F]" />
+                <img src="/input_file_10.png" class="w-3 h-3 object-contain" alt="hot" />
                 <span>{{ item.hot }}热度</span>
               </div>
             </div>
           </div>
           <div class="flex justify-center mt-6">
-            <ChevronDown class="w-6 h-6 text-gray-300 bg-gray-100 rounded-full p-1" />
+            <img src="/input_file_1.png" class="w-6 h-6 object-contain bg-gray-100 rounded-full p-1" alt="expand" />
           </div>
         </div>
       </div>
@@ -157,7 +157,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { X, MoreHorizontal, Search, XCircle, Trash2, ChevronRight, Flame, ChevronDown } from 'lucide-vue-next';
 
 const emit = defineEmits(['back', 'navigate']);
 
