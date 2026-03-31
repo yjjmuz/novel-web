@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
       <button class="p-1" @click="$emit('back')">
-        <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
+        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">

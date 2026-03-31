@@ -12,7 +12,7 @@
         @click.stop
       >
         <button @click="$emit('back')" class="p-1">
-          <img src="/input_file_3.png" class="w-6 h-6 object-contain" alt="back" />
+          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
         </button>
         <h1 class="text-lg font-medium text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">

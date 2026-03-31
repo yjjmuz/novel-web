@@ -14,7 +14,7 @@
         />
         <!-- Notification Dot -->
         <span 
-          v-if="item.id === 'bookshelf' && activeId !== 'bookshelf'" 
+          v-if="false" 
           class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-orange-500 rounded-full border border-white"
         ></span>
       </div>

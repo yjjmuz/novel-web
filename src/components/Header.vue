@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="relative">
-        <img src="/input_file_21.png" class="w-6 h-6 object-contain" alt="checkin" />
+        <img src="/clipboard.png" class="w-6 h-6 object-contain" alt="checkin" />
         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1 rounded-full scale-75">签到</span>
       </div>
     </div>

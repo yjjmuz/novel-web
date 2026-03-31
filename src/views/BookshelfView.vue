@@ -22,7 +22,6 @@
                 :class="activeTab === 'bookshelf' ? 'text-[#1A1A1A]' : 'text-gray-400 text-lg'"
                 @click="activeTab = 'bookshelf'"
               >
-                <img :src="activeTab === 'bookshelf' ? '/input_file_20.png' : '/input_file_38.png'" class="w-6 h-6 object-contain" alt="bookshelf" />
                 书架
               </button>
               <button 
@@ -30,7 +29,6 @@
                 :class="activeTab === 'history' ? 'text-[#1A1A1A]' : 'text-gray-400 text-lg'"
                 @click="activeTab = 'history'"
               >
-                <img :src="activeTab === 'history' ? '/input_file_46.png' : '/input_file_45.png'" class="w-6 h-6 object-contain" alt="history" />
                 浏览历史
               </button>
             </div>
@@ -127,10 +125,10 @@
     <!-- Bottom Delete Bar -->
     <div 
       v-if="isEditMode" 
-      class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 py-3 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors"
+      class="fixed bottom-20 left-0 right-0 bg-white py-3 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors"
       @click="deleteSelected"
     >
-      <img src="/input_file_4.png" class="w-6 h-6 object-contain" alt="delete" />
+      <img src="/bag-tick@2x(1).png" class="w-6 h-6 object-contain" alt="delete" />
       <span class="text-[10px] text-[#7C4DFF]">删除</span>
     </div>
   </div>
