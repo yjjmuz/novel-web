@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#F8F9FA] pb-20 font-sans text-[#333]">
     <Header @search="$emit('search')" />
+    <BannerCarousel />
 
     <!-- Tabs -->
     <nav class="flex items-center gap-6 px-4 py-4">
@@ -30,11 +31,17 @@
         <BookGrid title="完结书籍" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
         <HotPicksSection :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
       </template>
-      <template v-else>
-        <div class="flex flex-col items-center justify-center py-20 text-gray-400">
-          <img src="/input_file_38.png" class="w-12 h-12 mb-2 opacity-20 object-contain" alt="empty" />
-          <p>{{ activeTab }}频道内容正在加载中...</p>
-        </div>
+      <template v-else-if="activeTab === '男生'">
+        <RankingSection :books="rankingBooks" @click-book="$emit('navigate', 'bookDetail')" />
+        <HotPicksSection title="热门精品" :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
+        <BookGrid title="男生精选" :books="freeBooks" @click-book="$emit('navigate', 'bookDetail')" />
+        <BookGrid title="热血玄幻" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
+      </template>
+      <template v-else-if="activeTab === '女生'">
+        <RankingSection :books="rankingBooks" @click-book="$emit('navigate', 'bookDetail')" />
+        <HotPicksSection title="热门精品" :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
+        <BookGrid title="女生精选" :books="freeBooks" @click-book="$emit('navigate', 'bookDetail')" />
+        <BookGrid title="言情精品" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
       </template>
     </main>
   </div>
@@ -43,6 +50,7 @@
 <script setup>
 import { ref } from 'vue';
 import Header from '../components/Header.vue';
+import BannerCarousel from '../components/BannerCarousel.vue';
 import RankingSection from '../components/RankingSection.vue';
 import HotPicksSection from '../components/HotPicksSection.vue';
 import BookGrid from '../components/BookGrid.vue';

@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
       <button class="p-1" @click="$emit('back')">
-        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
+        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">
@@ -55,7 +55,7 @@
             <h3 class="text-xl font-bold text-[#1A1A1A]">目录</h3>
             <span class="text-sm text-gray-400">(1233章)</span>
           </div>
-          <button class="flex items-center gap-0.5 text-sm text-gray-400">
+          <button @click="$emit('catalog')" class="flex items-center gap-0.5 text-sm text-gray-400">
             更多
             <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
           </button>
@@ -70,19 +70,19 @@
     </div>
 
     <!-- Bottom Action Bar -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-4 py-3 flex items-center justify-between z-20">
+    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-4 flex items-center gap-8 z-20">
       <div class="flex items-center gap-6">
-        <button class="flex flex-col items-center gap-1">
-          <img src="/input_file_54.png" class="w-6 h-6 object-contain" alt="listen" />
-          <span class="text-[10px] text-[#1A1A1A]">听书</span>
+        <button class="flex items-center gap-2">
+          <img src="/vuesax_linear_music-play@2x.png" class="w-6 h-6 object-contain" alt="listen" />
+          <span class="text-sm text-[#1A1A1A]">听书</span>
         </button>
-        <button class="flex flex-col items-center gap-1" @click="toggleShelf">
-          <img :src="isInShelf ? '/input_file_20.png' : '/input_file_38.png'" class="w-6 h-6 object-contain" alt="shelf" />
-          <span class="text-[10px] text-[#1A1A1A]">{{ isInShelf ? '已在书架' : '加入书架' }}</span>
+        <button class="flex items-center gap-2" @click="toggleShelf">
+          <img :src="isInShelf ? '/容器@2x(1).png' : '/容器@2x(2).png'" class="w-6 h-6 object-contain" alt="shelf" />
+          <span class="text-sm text-gray-400">{{ isInShelf ? '已在书架' : '加入书架' }}</span>
         </button>
       </div>
       <button 
-        class="bg-[#7C3AED] text-white font-bold py-3 px-12 rounded-xl text-base shadow-lg shadow-[#7C3AED]/20 active:opacity-90 transition-opacity"
+        class="flex-1 bg-[#7C8BFF] text-white font-bold py-3.5 rounded-xl text-base active:opacity-90 transition-opacity"
         @click="$emit('read')"
       >
         立即阅读

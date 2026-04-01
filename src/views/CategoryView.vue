@@ -4,7 +4,7 @@
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2">
       <div class="flex items-center justify-between mb-4">
         <button class="p-1">
-          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
+          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-xl font-bold text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
@@ -49,7 +49,7 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-const activeGender = ref('男生');
+const activeGender = ref('女生');
 
 defineEmits(['select-category']);
 

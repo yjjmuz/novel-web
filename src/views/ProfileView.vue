@@ -13,21 +13,22 @@
 
     <!-- User Info Section -->
     <div class="bg-white px-4 pt-6 pb-8 relative">
-      <button class="absolute top-2 right-4 p-1" @click="$emit('navigate', 'profileSettings')">
+      <button v-if="isLoggedIn" class="absolute top-2 right-4 p-1" @click="$emit('navigate', 'profileSettings')">
         <img src="/input_file_17.png" class="w-6 h-6 object-contain" alt="settings" />
       </button>
       
       <div class="flex items-center justify-between">
-        <div class="flex items-center gap-4 cursor-pointer active:opacity-70" @click="$emit('navigate', 'login')">
-          <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-sm">
-            <img src="https://picsum.photos/seed/user_avatar/200/200" alt="Avatar" class="w-full h-full object-cover" referrerPolicy="no-referrer" />
+        <div class="flex items-center gap-4 cursor-pointer active:opacity-70" @click="isLoggedIn ? $emit('navigate', 'profileSettings') : $emit('navigate', 'login')">
+          <div class="w-16 h-16 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-50 flex items-center justify-center">
+            <img v-if="isLoggedIn" src="https://picsum.photos/seed/user_avatar/200/200" alt="Avatar" class="w-full h-full object-cover" referrerPolicy="no-referrer" />
+            <img v-else src="/input_file_56.png" alt="Avatar" class="w-8 h-8 object-contain opacity-20" />
           </div>
           <div>
-            <h2 class="text-xl font-bold text-[#1A1A1A]">用户·笔趣阁</h2>
-            <p class="text-sm text-gray-400 mt-0.5">点击登录/注册</p>
+            <h2 class="text-xl font-bold text-[#1A1A1A]">{{ isLoggedIn ? '用户·笔趣阁' : '未登录' }}</h2>
+            <p class="text-sm text-gray-400 mt-0.5">{{ isLoggedIn ? 'ID: 91283192' : '点击登录/注册' }}</p>
           </div>
         </div>
-        <button class="flex items-center gap-1 text-sm text-gray-400" @click="$emit('navigate', 'profileSettings')">
+        <button v-if="isLoggedIn" class="flex items-center gap-1 text-sm text-gray-400" @click="$emit('navigate', 'profileSettings')">
           个人主页
           <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
         </button>
@@ -80,6 +81,13 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  isLoggedIn: {
+    type: Boolean,
+    default: false
+  }
+});
+
 defineEmits(['navigate']);
 
 const recommendedBooks = [

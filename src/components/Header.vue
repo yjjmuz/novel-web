@@ -1,5 +1,5 @@
 <template>
-  <header class="sticky top-0 z-10 bg-[#F8F9FA] px-4 pt-4 pb-2">
+  <header class="sticky top-0 z-10 bg-gradient-to-b from-[#F3E5F5] to-[#F8F9FA] px-4 pt-4 pb-2">
     <div class="flex items-center justify-between mb-4">
       <button class="p-1">
         <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
@@ -20,7 +20,7 @@
         </div>
       </div>
       <div class="relative">
-        <img src="/clipboard.png" class="w-6 h-6 object-contain" alt="checkin" />
+        <img src="/input_file_21.png" class="w-6 h-6 object-contain" alt="checkin" />
         <span class="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1 rounded-full scale-75">签到</span>
       </div>
     </div>

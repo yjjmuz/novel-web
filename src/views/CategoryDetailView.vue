@@ -4,7 +4,7 @@
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 border-b border-gray-100">
       <div class="flex items-center justify-between">
         <button class="p-1" @click="$emit('back')">
-          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
+          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-xl font-bold text-[#1A1A1A]">{{ categoryName }}</h1>
         <button class="p-1">

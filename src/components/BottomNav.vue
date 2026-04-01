@@ -12,11 +12,6 @@
           class="w-6 h-6 object-contain"
           alt="nav icon"
         />
-        <!-- Notification Dot -->
-        <span 
-          v-if="false" 
-          class="absolute -top-0.5 -right-0.5 w-2 h-2 bg-orange-500 rounded-full border border-white"
-        ></span>
       </div>
       <span :class="['text-[10px]', activeId === item.id ? 'text-[#7C4DFF] font-bold' : 'text-gray-400']">
         {{ item.name }}

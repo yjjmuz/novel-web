@@ -3,7 +3,7 @@
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
       <button class="p-1" @click="$emit('back')">
-        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
+        <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
       <button class="p-1">
@@ -45,7 +45,7 @@
             <img src="/input_file_18.png" class="w-5 h-5 object-contain opacity-30" alt="arrow" />
           </div>
         </div>
-        <div class="flex items-center justify-between px-5 py-4 active:bg-gray-50 cursor-pointer">
+        <div class="flex items-center justify-between px-5 py-4 active:bg-gray-50 cursor-pointer" @click="$emit('logout')">
           <span class="text-base text-[#1A1A1A]">退出登录</span>
           <img src="/input_file_18.png" class="w-5 h-5 object-contain opacity-30" alt="arrow" />
         </div>
@@ -55,5 +55,5 @@
 </template>
 
 <script setup>
-defineEmits(['back']);
+defineEmits(['back', 'logout']);
 </script>

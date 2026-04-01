@@ -54,81 +54,97 @@
     </header>
 
     <!-- Book Content -->
-    <main class="px-4 py-4">
-      <!-- Bookshelf Grid -->
-      <div v-if="activeTab === 'bookshelf'" class="grid grid-cols-3 gap-x-4 gap-y-6">
-        <div 
-          v-for="book in books" 
-          :key="book.id" 
-          class="relative flex flex-col gap-2 cursor-pointer"
-          @touchstart="handleTouchStart(book.id)"
-          @touchend="handleTouchEnd"
-          @mousedown="handleMouseDown(book.id)"
-          @mouseup="handleMouseUp"
-          @click="handleBookClick(book.id)"
-        >
-          <div class="relative aspect-[3/4] rounded-lg overflow-hidden shadow-sm border border-gray-50">
-            <img :src="book.cover" class="w-full h-full object-cover" referrerPolicy="no-referrer" />
-            <!-- Selection Overlay -->
-            <div 
-              v-if="isEditMode" 
-              class="absolute inset-0 bg-black/5 flex items-start justify-end p-1.5"
-            >
+    <main class="px-4 py-4 flex-1 flex flex-col">
+      <template v-if="isLoggedIn">
+        <!-- Bookshelf Grid -->
+        <div v-if="activeTab === 'bookshelf'" class="grid grid-cols-3 gap-x-4 gap-y-6">
+          <div 
+            v-for="book in books" 
+            :key="book.id" 
+            class="relative flex flex-col gap-2 cursor-pointer"
+            @touchstart="handleTouchStart(book.id)"
+            @touchend="handleTouchEnd"
+            @mousedown="handleMouseDown(book.id)"
+            @mouseup="handleMouseUp"
+            @click="handleBookClick(book.id)"
+          >
+            <div class="relative aspect-[3/4] rounded-lg overflow-hidden shadow-sm border border-gray-50">
+              <img :src="book.cover" class="w-full h-full object-cover" referrerPolicy="no-referrer" />
+              <!-- Selection Overlay -->
               <div 
-                class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors"
-                :class="selectedIds.includes(book.id) ? 'bg-[#7C4DFF] border-[#7C4DFF]' : 'bg-white/80 border-gray-300'"
+                v-if="isEditMode" 
+                class="absolute inset-0 bg-black/5 flex items-start justify-end p-1.5"
               >
-                <img v-if="selectedIds.includes(book.id)" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
+                <div 
+                  class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors"
+                  :class="selectedIds.includes(book.id) ? 'bg-[#7C4DFF] border-[#7C4DFF]' : 'bg-white/80 border-gray-300'"
+                >
+                  <img v-if="selectedIds.includes(book.id)" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
+                </div>
               </div>
             </div>
-          </div>
-          <div class="flex flex-col gap-1">
-            <h3 class="text-sm font-medium text-[#1A1A1A] line-clamp-2 leading-tight h-9">
-              {{ book.title }}
-            </h3>
-            <p class="text-[10px] text-gray-400">{{ book.progress }}</p>
+            <div class="flex flex-col gap-1">
+              <h3 class="text-sm font-medium text-[#1A1A1A] line-clamp-2 leading-tight h-9">
+                {{ book.title }}
+              </h3>
+              <p class="text-[10px] text-gray-400">{{ book.progress }}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- History List -->
-      <div v-else class="space-y-8">
-        <div v-for="item in historyBooks" :key="item.id" class="flex gap-4 cursor-pointer active:opacity-70" @click="emit('navigate', 'bookDetail')">
-          <img :src="item.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
-          <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
-            <div class="flex justify-between items-start">
-              <div class="flex-1 pr-2">
-                <h3 class="text-base font-bold line-clamp-1 leading-tight">
-                  <span class="text-red-500">遮天</span>{{ item.titleSuffix }}
-                </h3>
-                <p class="text-xs text-gray-400 mt-2 line-clamp-1">{{ item.description }}</p>
+        <!-- History List -->
+        <div v-else class="space-y-8">
+          <div v-for="item in historyBooks" :key="item.id" class="flex gap-4 cursor-pointer active:opacity-70" @click="emit('navigate', 'bookDetail')">
+            <img :src="item.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
+            <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
+              <div class="flex justify-between items-start">
+                <div class="flex-1 pr-2">
+                  <h3 class="text-base font-bold line-clamp-1 leading-tight">
+                    <span class="text-red-500">遮天</span>{{ item.titleSuffix }}
+                  </h3>
+                  <p class="text-xs text-gray-400 mt-2 line-clamp-1">{{ item.description }}</p>
+                </div>
+                <button 
+                  class="px-3 py-1.5 rounded-full text-xs transition-all flex-shrink-0"
+                  :class="item.isInBookshelf ? 'bg-gray-100 text-gray-400' : 'bg-gradient-to-r from-[#B388FF] to-[#7C4DFF] text-white shadow-sm'"
+                  @click.stop="toggleInBookshelf(item)"
+                >
+                  {{ item.isInBookshelf ? '已加入书架' : '加入书架' }}
+                </button>
               </div>
-              <button 
-                class="px-3 py-1.5 rounded-full text-xs transition-all flex-shrink-0"
-                :class="item.isInBookshelf ? 'bg-gray-100 text-gray-400' : 'bg-gradient-to-r from-[#B388FF] to-[#7C4DFF] text-white shadow-sm'"
-                @click.stop="toggleInBookshelf(item)"
-              >
-                {{ item.isInBookshelf ? '已加入书架' : '加入书架' }}
-              </button>
-            </div>
-            <div class="flex items-center gap-2 text-xs text-gray-400 mt-2">
-              <span v-for="(tag, idx) in item.tags" :key="idx">
-                {{ tag }}
-                <span v-if="idx < item.tags.length - 1" class="ml-1">·</span>
-              </span>
+              <div class="flex items-center gap-2 text-xs text-gray-400 mt-2">
+                <span v-for="(tag, idx) in item.tags" :key="idx">
+                  {{ tag }}
+                  <span v-if="idx < item.tags.length - 1" class="ml-1">·</span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
+      </template>
+
+      <!-- Not Logged In State -->
+      <div v-else class="flex-1 flex flex-col items-center justify-center py-20">
+        <div class="w-32 h-32 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+          <img src="/input_file_38.png" class="w-16 h-16 object-contain opacity-20" alt="empty bookshelf" />
+        </div>
+        <p class="text-gray-400 text-sm mb-8">登录后可同步书架书籍</p>
+        <button 
+          class="px-12 py-3 bg-gradient-to-r from-[#B388FF] to-[#7C4DFF] text-white rounded-full font-bold shadow-lg shadow-[#7C4DFF]/20 active:scale-95 transition-transform"
+          @click="$emit('navigate', 'login')"
+        >
+          去登录
+        </button>
       </div>
     </main>
 
     <!-- Bottom Delete Bar -->
     <div 
       v-if="isEditMode" 
-      class="fixed bottom-20 left-0 right-0 bg-white py-3 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors"
+      class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 py-3 flex flex-col items-center justify-center gap-1 active:bg-gray-50 transition-colors"
       @click="deleteSelected"
     >
-      <img src="/bag-tick@2x(1).png" class="w-6 h-6 object-contain" alt="delete" />
+      <img src="/input_file_4.png" class="w-6 h-6 object-contain" alt="delete" />
       <span class="text-[10px] text-[#7C4DFF]">删除</span>
     </div>
   </div>
@@ -141,6 +157,13 @@ import { ElMessageBox, ElMessage } from 'element-plus';
 const activeTab = ref('bookshelf');
 const isEditMode = ref(false);
 const selectedIds = ref([]);
+
+const props = defineProps({
+  isLoggedIn: {
+    type: Boolean,
+    default: false
+  }
+});
 
 const emit = defineEmits(['search', 'navigate']);
 

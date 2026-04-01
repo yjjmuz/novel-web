@@ -12,7 +12,7 @@
         @click.stop
       >
         <button @click="$emit('back')" class="p-1">
-          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
+          <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
         <h1 class="text-lg font-medium text-[#1A1A1A]">贵妃书斋</h1>
         <button class="p-1">
@@ -149,40 +149,6 @@
       </div>
     </transition>
 
-    <!-- Catalog Drawer -->
-    <transition name="fade">
-      <div v-if="showCatalog" class="fixed inset-0 z-[60] bg-black/40" @click="showCatalog = false">
-        <transition name="slide-left">
-          <div class="w-[85%] h-full bg-white flex flex-col" @click.stop>
-            <div class="p-6 border-b border-gray-50">
-              <div class="flex gap-4 mb-6">
-                <img src="https://picsum.photos/seed/reader_cover/200/300" class="w-16 h-20 object-cover rounded shadow-sm" referrerPolicy="no-referrer" />
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-[#1A1A1A]">苟在妖武乱世修仙</h3>
-                  <p class="text-sm text-gray-400 mt-1">作者：拿钱吃饭</p>
-                </div>
-                <img src="/input_file_0.png" class="w-5 h-5 object-contain text-gray-300 self-center" alt="arrow" />
-              </div>
-              <div class="flex items-center justify-between">
-                <h2 class="text-xl font-bold text-[#1A1A1A]">目录 <span class="text-sm font-normal text-gray-400 ml-2">(1233章)</span></h2>
-              </div>
-            </div>
-            <div class="flex-1 overflow-y-auto">
-              <div 
-                v-for="(chapter, idx) in allChapters" 
-                :key="idx"
-                class="px-6 py-4 flex items-center justify-between active:bg-gray-50"
-                @click="selectChapter(idx)"
-              >
-                <span class="text-sm text-gray-600">{{ chapter.title }}</span>
-                <span v-if="chapter.isPaid" class="text-[10px] text-[#7C4DFF] bg-[#F3E5F5] px-2 py-0.5 rounded">付费章节</span>
-              </div>
-            </div>
-          </div>
-        </transition>
-      </div>
-    </transition>
-
     <!-- Toast -->
     <transition name="fade">
       <div v-if="showToast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[100] bg-black/70 text-white px-6 py-3 rounded-xl text-sm">
@@ -195,10 +161,9 @@
 <script setup>
 import { ref, computed } from 'vue';
 
-const emit = defineEmits(['back']);
+const emit = defineEmits(['back', 'catalog']);
 
 const showMenu = ref(false);
-const showCatalog = ref(false);
 const activeSubMenu = ref('none'); // 'none', 'brightness', 'settings'
 const showToast = ref(false);
 
@@ -248,18 +213,6 @@ const tabs = computed(() => [
   { id: 'settings', label: '设置', icon: '/input_file_17.png' },
 ]);
 
-const allChapters = [
-  { title: '第一章 重生反馈开始前', isPaid: false },
-  { title: '第二章 游戏里的双休道侣', isPaid: false },
-  { title: '第三章 异常的排行榜', isPaid: false },
-  { title: '第四章 修为排行榜第一', isPaid: false },
-  { title: '第五章 游戏里的双休道侣', isPaid: false },
-  { title: '第六章 长河宗宗主', isPaid: false },
-  { title: '第七章 买什么车，都充游戏', isPaid: true },
-  { title: '第八章 游戏里的双休道侣', isPaid: true },
-  { title: '第九章 游戏里的双休道侣', isPaid: true },
-];
-
 const currentBgColor = computed(() => isDarkMode.value ? '#121212' : bgColor.value);
 const textColor = computed(() => isDarkMode.value ? '#999' : '#1A1A1A');
 
@@ -270,18 +223,13 @@ const toggleMenu = () => {
 
 const handleTabClick = (id) => {
   if (id === 'catalog') {
-    showCatalog.value = true;
+    emit('catalog');
     showMenu.value = false;
   } else if (id === 'mode') {
     isDarkMode.value = !isDarkMode.value;
   } else {
     activeSubMenu.value = activeSubMenu.value === id ? 'none' : id;
   }
-};
-
-const selectChapter = (idx) => {
-  showCatalog.value = false;
-  // Handle chapter selection
 };
 
 const triggerToast = () => {
