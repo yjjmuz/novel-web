@@ -28,22 +28,31 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
-const banners = [
-  'https://picsum.photos/seed/banner1/800/340',
-  'https://picsum.photos/seed/banner2/800/340',
-  'https://picsum.photos/seed/banner3/800/340',
-];
+const props = defineProps({
+  banners: {
+    type: Array,
+    default: () => []
+  }
+});
 
 const currentIndex = ref(0);
 let timer = null;
 
 const startTimer = () => {
+  if (timer) clearInterval(timer);
+  if (props.banners.length <= 1) return;
+  
   timer = setInterval(() => {
-    currentIndex.value = (currentIndex.value + 1) % banners.length;
+    currentIndex.value = (currentIndex.value + 1) % props.banners.length;
   }, 3000);
 };
+
+watch(() => props.banners, () => {
+  currentIndex.value = 0;
+  startTimer();
+}, { deep: true });
 
 onMounted(() => {
   startTimer();

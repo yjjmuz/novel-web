@@ -13,10 +13,16 @@
       </div>
     </header>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-gray-400">正在获取书籍...</p>
+    </div>
+
     <!-- Book List -->
-    <main class="p-4">
+    <main v-else class="p-4">
       <div class="bg-white rounded-2xl p-4 shadow-sm space-y-8">
-        <div v-for="(book, index) in books" :key="index" class="flex gap-4 cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail')">
+        <div v-for="(book, index) in books" :key="index" class="flex gap-4 cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail', book.id)">
           <img :src="book.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
           <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
             <div>
@@ -39,71 +45,52 @@
 </template>
 
 <script setup>
-defineProps({
+import { ref, onMounted, nextTick } from 'vue';
+import { getCategoryDetail } from '../services/api';
+
+const props = defineProps({
+  categoryId: {
+    type: [String, Number],
+    required: true
+  },
   categoryName: {
     type: String,
-    default: '古代言情'
+    default: '分类详情'
   }
 });
 
-defineEmits(['back', 'navigate']);
+const emit = defineEmits(['back', 'navigate']);
 
-const books = [
-  { 
-    title: '遮天之从蓝日开始', 
-    desc: '行医第一方：让求医夫妻和离，震惊大宋。',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det1/200/300'
-  },
-  { 
-    title: '遮天之师兄说得对', 
-    desc: '修仙觅长生，热血任逍遥，踏莲曳波涤剑骨',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det2/200/300'
-  },
-  { 
-    title: '遮天之深空彼岸', 
-    desc: '浩瀚的宇宙中，一片星系的生灭',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det3/200/300'
-  },
-  { 
-    title: '遮天之我为长生仙', 
-    desc: '仙神妖魔，王侯将相；龙女掌灯，杯中盛海',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det4/200/300'
-  },
-  { 
-    title: '遮天之师兄说得对', 
-    desc: '修仙觅长生，热血任逍遥，踏莲曳波涤剑骨',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det5/200/300'
-  },
-  { 
-    title: '遮天之深空彼岸', 
-    desc: '浩瀚的宇宙中，一片星系的生灭',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det6/200/300'
-  },
-  { 
-    title: '遮天之师兄说得对', 
-    desc: '修仙觅长生，热血任逍遥，踏莲曳波涤剑骨',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    cover: 'https://picsum.photos/seed/det7/200/300'
-  },
-];
+const loading = ref(true);
+const books = ref([]);
+
+const normalizeBook = (book) => ({
+  id: book.articleid,
+  title: book.articlename,
+  cover: book.icon,
+  desc: book.intro,
+  author: book.author,
+  words: book.words ? `${(book.words / 10000).toFixed(1)}万字` : '未知',
+  category: book.type_txt || '其他',
+  reads: book.allvisit ? `${(book.allvisit / 10000).toFixed(1)}万` : '0'
+});
+
+const fetchBooks = async () => {
+  loading.value = true;
+  try {
+    const data = await getCategoryDetail(props.categoryId);
+    books.value = data.map(normalizeBook);
+  } catch (error) {
+    console.error('Fetch category detail error:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  nextTick(() => {
+    window.scrollTo(0, 0);
+  });
+  fetchBooks();
+});
 </script>

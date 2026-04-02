@@ -27,15 +27,17 @@
         <div class="w-full space-y-4">
           <div class="relative">
             <input 
+              v-model="phone"
               type="text" 
-              placeholder="北辰"
+              placeholder="请输入手机号"
               class="w-full bg-[#F0F2F5] rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C4DFF]/30 transition-all"
             />
           </div>
           <div class="relative">
             <input 
+              v-model="password"
               :type="showPassword ? 'text' : 'password'" 
-              placeholder="91283192"
+              placeholder="请输入密码"
               class="w-full bg-[#F0F2F5] rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C4DFF]/30 transition-all"
             />
             <button 
@@ -49,10 +51,12 @@
 
         <!-- Action Button -->
         <button 
-          class="w-full mt-12 py-4 bg-gradient-to-r from-[#E1BEE7] to-[#B39DDB] text-white rounded-full font-medium shadow-md active:scale-[0.98] transition-transform"
+          class="w-full mt-12 py-4 bg-gradient-to-r from-[#E1BEE7] to-[#B39DDB] text-white rounded-full font-medium shadow-md active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-70"
+          :disabled="loading"
           @click="handleLogin"
         >
-          登录
+          <div v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          {{ loading ? '登录中...' : '登录' }}
         </button>
 
         <!-- Footer Links -->
@@ -76,13 +80,15 @@
         <div class="w-full space-y-4">
           <div class="relative">
             <input 
+              v-model="phone"
               type="text" 
-              placeholder="手机号/用户名/邮箱"
+              placeholder="请输入手机号"
               class="w-full bg-[#F0F2F5] rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C4DFF]/30 transition-all"
             />
           </div>
           <div class="relative">
             <input 
+              v-model="password"
               :type="showPassword ? 'text' : 'password'" 
               placeholder="请设置您的密码（6-18位字符）"
               class="w-full bg-[#F0F2F5] rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C4DFF]/30 transition-all"
@@ -96,6 +102,7 @@
           </div>
           <div class="relative">
             <input 
+              v-model="confirmPassword"
               :type="showConfirmPassword ? 'text' : 'password'" 
               placeholder="请再次输入您设置的密码"
               class="w-full bg-[#F0F2F5] rounded-full px-6 py-4 text-sm focus:outline-none focus:ring-1 focus:ring-[#7C4DFF]/30 transition-all"
@@ -111,10 +118,12 @@
 
         <!-- Action Button -->
         <button 
-          class="w-full mt-12 py-4 bg-[#A6B1C2] text-white rounded-full font-medium shadow-sm active:scale-[0.98] transition-transform"
+          class="w-full mt-12 py-4 bg-[#A6B1C2] text-white rounded-full font-medium shadow-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-2 disabled:opacity-70"
+          :disabled="loading"
           @click="handleRegister"
         >
-          注册
+          <div v-if="loading" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          {{ loading ? '注册中...' : '注册' }}
         </button>
 
         <!-- Footer Links -->
@@ -143,6 +152,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { login, register } from '../services/api';
 
 const emit = defineEmits(['back', 'login-success']);
 
@@ -151,27 +161,57 @@ const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const agreed = ref(true);
 
-const handleLogin = () => {
-  ElMessage({
-    type: 'success',
-    message: '登录成功',
-  });
-  emit('login-success');
-};
+const phone = ref('');
+const password = ref('');
+const confirmPassword = ref('');
+const loading = ref(false);
 
-const handleRegister = () => {
-  if (!agreed.value) {
-    ElMessage({
-      type: 'warning',
-      message: '请先阅读并同意用户协议',
-    });
+const handleLogin = async () => {
+  if (!phone.value || !password.value) {
+    ElMessage.warning('请输入手机号和密码');
     return;
   }
-  ElMessage({
-    type: 'success',
-    message: '注册成功，请登录',
-  });
-  mode.value = 'login';
+  loading.value = true;
+  try {
+    const data = await login(phone.value, password.value);
+    ElMessage.success('登录成功');
+    // Save to localStorage
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('userData', JSON.stringify(data.user.user));
+    emit('login-success', data.user.user);
+  } catch (error) {
+    ElMessage.error(error.message || '登录失败');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleRegister = async () => {
+  if (!agreed.value) {
+    ElMessage.warning('请先阅读并同意用户协议');
+    return;
+  }
+  if (!phone.value || !password.value || !confirmPassword.value) {
+    ElMessage.warning('请填写完整信息');
+    return;
+  }
+  if (password.value !== confirmPassword.value) {
+    ElMessage.warning('两次输入密码不一致');
+    return;
+  }
+  loading.value = true;
+  try {
+    await register(phone.value, password.value);
+    ElMessage.success('注册成功，请登录');
+    mode.value = 'login';
+    // Clear password for login
+    password.value = '';
+    confirmPassword.value = '';
+  } catch (error) {
+    ElMessage.error(error.message || '注册失败');
+  } finally {
+    loading.value = false;
+  }
 };
 </script>
 

@@ -1,68 +1,76 @@
 <template>
   <div class="min-h-screen bg-[#F8F9FA] font-sans text-[#333]">
+    <!-- Main Tabs with v-show to keep state and avoid reloading -->
     <HomeView 
-      v-if="currentView === 'home'" 
+      v-show="currentView === 'home'" 
       @search="handleNavigate('search')" 
       @navigate="handleNavigate"
     />
     <CategoryView 
-      v-else-if="currentView === 'category'" 
+      v-show="currentView === 'category'" 
       @select-category="handleSelectCategory" 
     />
-    <CategoryDetailView 
-      v-else-if="currentView === 'categoryDetail'" 
-      :categoryName="selectedCategory" 
-      @back="handleNavigate('category')" 
-      @navigate="handleNavigate"
-    />
-    <SearchView 
-      v-else-if="currentView === 'search'" 
-      @back="handleNavigate('home')" 
-      @navigate="handleNavigate"
-    />
     <BookshelfView 
-      v-else-if="currentView === 'bookshelf'" 
+      v-show="currentView === 'bookshelf'" 
       :isLoggedIn="isLoggedIn"
       @search="handleNavigate('search')"
       @navigate="handleNavigate"
     />
     <ProfileView 
-      v-else-if="currentView === 'profile'" 
+      v-show="currentView === 'profile'" 
       :isLoggedIn="isLoggedIn"
+      :userData="userData"
+      @navigate="handleNavigate"
+    />
+
+    <!-- Sub Pages with v-if (standard navigation) -->
+    <CategoryDetailView 
+      v-if="currentView === 'categoryDetail'" 
+      :categoryId="selectedCategoryId"
+      :categoryName="selectedCategoryName" 
+      @back="goBack" 
+      @navigate="handleNavigate"
+    />
+    <SearchView 
+      v-if="currentView === 'search'" 
+      @back="goBack" 
       @navigate="handleNavigate"
     />
     <ProfileSettingsView
-      v-else-if="currentView === 'profileSettings'"
-      @back="handleNavigate('profile')"
+      v-if="currentView === 'profileSettings'"
+      :userData="userData"
+      @back="goBack"
       @logout="handleLogout"
     />
     <BookDetailView
-      v-else-if="currentView === 'bookDetail'"
-      @back="handleNavigate('home')"
-      @read="handleNavigate('reading')"
+      v-if="currentView === 'bookDetail'"
+      :bookId="selectedBookId"
+      @back="goBack"
+      @read="handleNavigate('reading', $event)"
       @catalog="handleNavigate('catalog')"
     />
     <ReadingView 
-      v-else-if="currentView === 'reading'" 
-      @back="handleNavigate('bookDetail')" 
+      v-if="currentView === 'reading'" 
+      :novelId="selectedBookId"
+      :chapterId="selectedChapterId"
+      @back="goBack" 
       @catalog="handleNavigate('catalog')"
+      @update-chapter="selectedChapterId = $event"
     />
     <CatalogView
-      v-else-if="currentView === 'catalog'"
-      @back="handleNavigate(previousView || 'reading')"
-      @select-chapter="handleNavigate('reading')"
+      v-if="currentView === 'catalog'"
+      :novelId="selectedBookId"
+      @back="goBack"
+      @select-chapter="handleNavigate('reading', $event)"
     />
     <LoginView
-      v-else-if="currentView === 'login'"
-      @back="handleNavigate('home')"
+      v-if="currentView === 'login'"
+      @back="goBack"
       @login-success="handleLoginSuccess"
     />
-    <div v-else class="flex items-center justify-center h-screen text-gray-400">
-      {{ currentView }} 页面正在开发中...
-    </div>
 
     <BottomNav 
-      v-if="!['categoryDetail', 'search', 'profileSettings', 'bookDetail', 'reading', 'login', 'catalog'].includes(currentView)" 
+      v-if="['home', 'category', 'bookshelf', 'profile'].includes(currentView)" 
       :activeId="currentView" 
       @navigate="handleNavigate" 
     />
@@ -70,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import HomeView from './views/HomeView.vue';
 import CategoryView from './views/CategoryView.vue';
 import CategoryDetailView from './views/CategoryDetailView.vue';
@@ -85,33 +93,91 @@ import LoginView from './views/LoginView.vue';
 import BottomNav from './components/BottomNav.vue';
 
 const currentView = ref('home');
-const previousView = ref('');
-const selectedCategory = ref('');
-const isLoggedIn = ref(false);
+const selectedCategoryName = ref('');
+const selectedCategoryId = ref('');
+const selectedBookId = ref('');
+const selectedChapterId = ref('');
+const isLoggedIn = ref(!!localStorage.getItem('token'));
+const userData = ref(JSON.parse(localStorage.getItem('userData') || 'null'));
 
-const handleNavigate = (view) => {
+const mainTabs = ['home', 'category', 'bookshelf', 'profile'];
+
+const handleNavigate = (view, id = null, pushState = true) => {
+  // Handle specific data updates
+  if (view === 'bookDetail' && id !== null) {
+    if (selectedBookId.value !== id) {
+      selectedBookId.value = id;
+      selectedChapterId.value = '';
+    }
+  } else if (view === 'reading' && id !== null) {
+    selectedChapterId.value = id;
+  }
+  
   if ((view === 'profile' || view === 'profileSettings') && !isLoggedIn.value) {
-    currentView.value = 'login';
+    handleNavigate('login', null, pushState);
     return;
   }
-  if (view === 'catalog') {
-    previousView.value = currentView.value;
-  }
+
+  // Update view
   currentView.value = view;
+
+  // Push to history if requested
+  if (pushState) {
+    const state = { 
+      view, 
+      selectedBookId: selectedBookId.value, 
+      selectedChapterId: selectedChapterId.value,
+      selectedCategoryId: selectedCategoryId.value,
+      selectedCategoryName: selectedCategoryName.value
+    };
+    window.history.pushState(state, '', '');
+  }
 };
 
-const handleLoginSuccess = () => {
+const goBack = () => {
+  window.history.back();
+};
+
+const handlePopState = (event) => {
+  if (event.state) {
+    const { view, selectedBookId: bid, selectedChapterId: cid, selectedCategoryId: catId, selectedCategoryName: catName } = event.state;
+    selectedBookId.value = bid;
+    selectedChapterId.value = cid;
+    selectedCategoryId.value = catId;
+    selectedCategoryName.value = catName;
+    currentView.value = view;
+  } else {
+    currentView.value = 'home';
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('popstate', handlePopState);
+  // Initial state for home
+  window.history.replaceState({ view: 'home' }, '', '');
+});
+
+onUnmounted(() => {
+  window.removeEventListener('popstate', handlePopState);
+});
+
+const handleLoginSuccess = (user) => {
   isLoggedIn.value = true;
-  currentView.value = 'home';
+  userData.value = user;
+  handleNavigate('home');
 };
 
 const handleLogout = () => {
   isLoggedIn.value = false;
-  currentView.value = 'home';
+  userData.value = null;
+  localStorage.removeItem('token');
+  localStorage.removeItem('userData');
+  handleNavigate('home');
 };
 
-const handleSelectCategory = (name) => {
-  selectedCategory.value = name;
+const handleSelectCategory = (category) => {
+  selectedCategoryName.value = category.name;
+  selectedCategoryId.value = category.id;
   handleNavigate('categoryDetail');
 };
 </script>

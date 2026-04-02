@@ -94,7 +94,7 @@
 
         <!-- History List -->
         <div v-else class="space-y-8">
-          <div v-for="item in historyBooks" :key="item.id" class="flex gap-4 cursor-pointer active:opacity-70" @click="emit('navigate', 'bookDetail')">
+          <div v-for="item in historyBooks" :key="item.id" class="flex gap-4 cursor-pointer active:opacity-70" @click="emit('navigate', 'bookDetail', item.id)">
             <img :src="item.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
             <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
               <div class="flex justify-between items-start">
@@ -151,7 +151,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, nextTick } from 'vue';
 import { ElMessageBox, ElMessage } from 'element-plus';
 
 const activeTab = ref('bookshelf');
@@ -166,6 +166,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits(['search', 'navigate']);
+
+onMounted(() => {
+  nextTick(() => {
+    window.scrollTo(0, 0);
+  });
+});
 
 const books = ref([
   { id: 1, title: '高手下山，我不会武功，...', progress: '1章/560章', cover: 'https://picsum.photos/seed/shelf1/200/300' },
@@ -227,7 +233,7 @@ const handleBookClick = (id) => {
       selectedIds.value.push(id);
     }
   } else {
-    emit('navigate', 'bookDetail');
+    emit('navigate', 'bookDetail', id);
   }
 };
 

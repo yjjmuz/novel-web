@@ -1,16 +1,16 @@
 <template>
   <div class="min-h-screen bg-[#F8F9FA] pb-20 font-sans text-[#333]">
     <Header @search="$emit('search')" />
-    <BannerCarousel />
+    <BannerCarousel :banners="banners" />
 
     <!-- Tabs -->
-    <nav class="flex items-center gap-6 px-4 py-4">
+    <nav class="flex items-center gap-6 px-4 py-4 overflow-x-auto no-scrollbar">
       <button 
         v-for="tab in ['推荐', '男生', '女生']" 
         :key="tab"
         @click="activeTab = tab"
         :class="[
-          'relative transition-all duration-200',
+          'relative transition-all duration-200 flex-shrink-0',
           activeTab === tab ? 'text-2xl font-bold text-[#1A1A1A]' : 'text-lg text-gray-500'
         ]"
       >
@@ -22,110 +22,94 @@
       </button>
     </nav>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-gray-400">正在加载精彩内容...</p>
+    </div>
+
     <!-- Content Sections -->
-    <main class="px-4 space-y-6">
-      <template v-if="activeTab === '推荐'">
-        <RankingSection :books="rankingBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <HotPicksSection title="热门精品" :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="免费书籍" :books="freeBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="完结书籍" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <HotPicksSection :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
-      </template>
-      <template v-else-if="activeTab === '男生'">
-        <RankingSection :books="rankingBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <HotPicksSection title="热门精品" :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="男生精选" :books="freeBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="热血玄幻" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
-      </template>
-      <template v-else-if="activeTab === '女生'">
-        <RankingSection :books="rankingBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <HotPicksSection title="热门精品" :books="hotPicks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="女生精选" :books="freeBooks" @click-book="$emit('navigate', 'bookDetail')" />
-        <BookGrid title="言情精品" :books="completedBooks" @click-book="$emit('navigate', 'bookDetail')" />
-      </template>
+    <main v-else class="px-4 space-y-6">
+      <RankingSection :books="rankingBooks" @click-book="handleBookClick" />
+      <HotPicksSection title="热门精品" :books="hotPicks" @click-book="handleBookClick" />
+      <BookGrid title="免费书籍" :books="freeBooks" @click-book="handleBookClick" />
+      <BookGrid title="完结书籍" :books="completedBooks" @click-book="handleBookClick" />
+      <HotPicksSection title="最近更新" :books="newBooks" @click-book="handleBookClick" />
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import Header from '../components/Header.vue';
 import BannerCarousel from '../components/BannerCarousel.vue';
 import RankingSection from '../components/RankingSection.vue';
 import HotPicksSection from '../components/HotPicksSection.vue';
 import BookGrid from '../components/BookGrid.vue';
+import { getHomeData } from '../services/api';
 
 const activeTab = ref('推荐');
+const loading = ref(true);
+const banners = ref([]);
+const rankingBooks = ref([]);
+const hotPicks = ref([]);
+const freeBooks = ref([]);
+const completedBooks = ref([]);
+const newBooks = ref([]);
 
-defineEmits(['search', 'navigate']);
+const emit = defineEmits(['search', 'navigate']);
 
-const rankingBooks = [
-  { title: '农家小娇妻·宠你没商量', words: '205万字', cover: 'https://picsum.photos/seed/book1/200/300' },
-  { title: '农家小娇妻·宠你没商量', words: '205万字', cover: 'https://picsum.photos/seed/book2/200/300' },
-  { title: '剑道天穹阁', words: '105万字', cover: 'https://picsum.photos/seed/book3/200/300' },
-  { title: '农家小娇妻·宠你没商量', words: '205万字', cover: 'https://picsum.photos/seed/book4/200/300' },
-  { title: '浮生六记·浮生若梦 人生几何', words: '205万字', cover: 'https://picsum.photos/seed/book5/200/300' },
-  { title: '农家小娇妻·宠你没商量', words: '205万字', cover: 'https://picsum.photos/seed/book6/200/300' },
-];
+const normalizeBook = (book) => ({
+  id: book.articleid,
+  title: book.articlename,
+  cover: book.icon,
+  desc: book.intro,
+  author: book.author,
+  words: book.words ? `${(book.words / 10000).toFixed(1)}万字` : '未知',
+  category: book.type_txt || '其他',
+  reads: book.allvisit ? `${(book.allvisit / 10000).toFixed(1)}万` : '0',
+  isHot: true
+});
 
-const hotPicks = [
-  { 
-    title: '大宋医相：开局和李清照私定...', 
-    desc: '行医第一方：让求医夫妻和离，震惊大宋。',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    isHot: true,
-    cover: 'https://picsum.photos/seed/hot1/200/300'
-  },
-  { 
-    title: '师兄说得对', 
-    desc: '修仙觅长生，热血任逍遥，踏莲曳波涤剑骨',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    isHot: true,
-    cover: 'https://picsum.photos/seed/hot2/200/300'
-  },
-  { 
-    title: '深空彼岸', 
-    desc: '浩瀚的宇宙中，一片星系的生灭',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    isHot: true,
-    cover: 'https://picsum.photos/seed/hot3/200/300'
-  },
-  { 
-    title: '我为长生仙', 
-    desc: '仙神妖魔，王侯将相；龙女掌灯，杯中盛海',
-    category: '穿越',
-    words: '205万字',
-    reads: '156万',
-    isHot: true,
-    cover: 'https://picsum.photos/seed/hot4/200/300'
-  },
-];
+const fetchData = async () => {
+  loading.value = true;
+  try {
+    const channel = activeTab.value === '女生' ? '1' : '2';
+    const data = await getHomeData(channel);
+    
+    banners.value = data.banners.map(b => b.img);
+    rankingBooks.value = data.rank.map(normalizeBook);
+    hotPicks.value = data.hot.map(normalizeBook);
+    freeBooks.value = data.free.map(normalizeBook);
+    completedBooks.value = data.full.map(normalizeBook);
+    newBooks.value = data.new.map(normalizeBook);
+  } catch (error) {
+    console.error('Fetch error:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 
-const freeBooks = [
-  { title: '师兄说得对', cover: 'https://picsum.photos/seed/free1/200/300' },
-  { title: '深空彼岸之逆仙伐圣', cover: 'https://picsum.photos/seed/free2/200/300' },
-  { title: '师兄说得对我没道理', cover: 'https://picsum.photos/seed/free3/200/300' },
-  { title: '蓝日', cover: 'https://picsum.photos/seed/free4/200/300' },
-  { title: '农家小娇妻·宠你', cover: 'https://picsum.photos/seed/free5/200/300' },
-  { title: '剑道天穹阁', cover: 'https://picsum.photos/seed/free6/200/300' },
-  { title: '窗外往事', cover: 'https://picsum.photos/seed/free7/200/300' },
-  { title: '浮生六记', cover: 'https://picsum.photos/seed/free8/200/300' },
-];
+const handleBookClick = (book) => {
+  emit('navigate', 'bookDetail', book.id);
+};
 
-const completedBooks = [
-  { title: '师兄说得对我没道理', cover: 'https://picsum.photos/seed/comp1/200/300' },
-  { title: '剑道天穹阁', cover: 'https://picsum.photos/seed/comp2/200/300' },
-  { title: '师兄说得对', cover: 'https://picsum.photos/seed/comp3/200/300' },
-  { title: '蓝日', cover: 'https://picsum.photos/seed/comp4/200/300' },
-  { title: '浮生六记', cover: 'https://picsum.photos/seed/comp5/200/300' },
-  { title: '深空彼岸之逆仙伐圣', cover: 'https://picsum.photos/seed/comp6/200/300' },
-  { title: '窗外往事', cover: 'https://picsum.photos/seed/comp7/200/300' },
-  { title: '农家小娇妻·宠你', cover: 'https://picsum.photos/seed/comp8/200/300' },
-];
+watch(activeTab, fetchData);
+
+onMounted(() => {
+  nextTick(() => {
+    window.scrollTo(0, 0);
+  });
+  fetchData();
+});
 </script>
+
+<style scoped>
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>

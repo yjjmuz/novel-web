@@ -24,8 +24,8 @@
             <img v-else src="/input_file_56.png" alt="Avatar" class="w-8 h-8 object-contain opacity-20" />
           </div>
           <div>
-            <h2 class="text-xl font-bold text-[#1A1A1A]">{{ isLoggedIn ? '用户·笔趣阁' : '未登录' }}</h2>
-            <p class="text-sm text-gray-400 mt-0.5">{{ isLoggedIn ? 'ID: 91283192' : '点击登录/注册' }}</p>
+            <h2 class="text-xl font-bold text-[#1A1A1A]">{{ isLoggedIn ? (userData?.name || userData?.uname || '用户·笔趣阁') : '未登录' }}</h2>
+            <p class="text-sm text-gray-400 mt-0.5">{{ isLoggedIn ? `ID: ${userData?.uid || '91283192'}` : '点击登录/注册' }}</p>
           </div>
         </div>
         <button v-if="isLoggedIn" class="flex items-center gap-1 text-sm text-gray-400" @click="$emit('navigate', 'profileSettings')">
@@ -85,6 +85,10 @@ const props = defineProps({
   isLoggedIn: {
     type: Boolean,
     default: false
+  },
+  userData: {
+    type: Object,
+    default: null
   }
 });
 

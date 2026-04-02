@@ -26,7 +26,7 @@
         <div class="flex items-center justify-between px-5 py-4 active:bg-gray-50 cursor-pointer">
           <span class="text-base text-[#1A1A1A]">昵称</span>
           <div class="flex items-center gap-2">
-            <span class="text-base text-gray-400">用户·笔趣阁</span>
+            <span class="text-base text-gray-400">{{ userData?.name || userData?.uname || '用户·笔趣阁' }}</span>
             <img src="/input_file_18.png" class="w-5 h-5 object-contain opacity-30" alt="arrow" />
           </div>
         </div>
@@ -41,7 +41,7 @@
         <div class="flex items-center justify-between px-5 py-4 border-b border-gray-50 active:bg-gray-50 cursor-pointer">
           <span class="text-base text-[#1A1A1A]">手机号</span>
           <div class="flex items-center gap-2">
-            <span class="text-base text-gray-400">128 6037 1954</span>
+            <span class="text-base text-gray-400">{{ userData?.phone || '未绑定' }}</span>
             <img src="/input_file_18.png" class="w-5 h-5 object-contain opacity-30" alt="arrow" />
           </div>
         </div>
@@ -55,5 +55,11 @@
 </template>
 
 <script setup>
+const props = defineProps({
+  userData: {
+    type: Object,
+    default: null
+  }
+});
 defineEmits(['back', 'logout']);
 </script>

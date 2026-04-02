@@ -28,18 +28,24 @@
       </button>
     </nav>
 
+    <!-- Loading State -->
+    <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+      <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-sm text-gray-400">正在获取分类...</p>
+    </div>
+
     <!-- Category Grid -->
-    <main class="px-4 grid grid-cols-2 gap-x-4 gap-y-8">
+    <main v-else class="px-4 grid grid-cols-2 gap-x-4 gap-y-8">
       <div 
-        v-for="(cat, index) in currentCategories" 
+        v-for="(cat, index) in categories" 
         :key="index" 
         class="flex items-center gap-3 cursor-pointer active:opacity-70"
-        @click="$emit('select-category', cat.name)"
+        @click="$emit('select-category', { id: cat.id, name: cat.name })"
       >
-        <img :src="cat.cover" class="w-16 h-20 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
+        <img :src="cat.img" class="w-16 h-20 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
         <div class="flex flex-col justify-center overflow-hidden">
           <h3 class="text-lg font-medium text-[#1A1A1A] truncate">{{ cat.name }}</h3>
-          <p class="text-sm text-gray-400 mt-1">{{ cat.count }}部</p>
+          <p class="text-sm text-gray-400 mt-1">{{ cat.num }}部</p>
         </div>
       </div>
     </main>
@@ -47,38 +53,34 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
+import { getCategoryList } from '../services/api';
 
-const activeGender = ref('女生');
+const activeGender = ref('男生');
+const loading = ref(true);
+const categories = ref([]);
 
 defineEmits(['select-category']);
 
-const femaleCategories = [
-  { name: '古代言情', count: '30241', cover: 'https://picsum.photos/seed/cat1/200/300' },
-  { name: '现代言情', count: '30241', cover: 'https://picsum.photos/seed/cat2/200/300' },
-  { name: '玄幻言情', count: '30241', cover: 'https://picsum.photos/seed/cat3/200/300' },
-  { name: '悬疑推理', count: '30241', cover: 'https://picsum.photos/seed/cat4/200/300' },
-  { name: '浪漫青春', count: '30241', cover: 'https://picsum.photos/seed/cat5/200/300' },
-  { name: '仙侠奇缘', count: '30241', cover: 'https://picsum.photos/seed/cat6/200/300' },
-  { name: '科幻空间', count: '30241', cover: 'https://picsum.photos/seed/cat7/200/300' },
-  { name: '游戏竞技', count: '30241', cover: 'https://picsum.photos/seed/cat8/200/300' },
-  { name: '轻小说', count: '30241', cover: 'https://picsum.photos/seed/cat9/200/300' },
-  { name: '短篇', count: '30241', cover: 'https://picsum.photos/seed/cat10/200/300' },
-  { name: '现实生活', count: '30241', cover: 'https://picsum.photos/seed/cat11/200/300' },
-];
+const fetchCategories = async () => {
+  loading.value = true;
+  try {
+    const channel = activeGender.value === '女生' ? '1' : '2';
+    const data = await getCategoryList(channel);
+    categories.value = data;
+  } catch (error) {
+    console.error('Fetch categories error:', error);
+  } finally {
+    loading.value = false;
+  }
+};
 
-const maleCategories = [
-  { name: '玄幻', count: '45210', cover: 'https://picsum.photos/seed/mcat1/200/300' },
-  { name: '奇幻', count: '12340', cover: 'https://picsum.photos/seed/mcat2/200/300' },
-  { name: '武侠', count: '8900', cover: 'https://picsum.photos/seed/mcat3/200/300' },
-  { name: '仙侠', count: '34210', cover: 'https://picsum.photos/seed/mcat4/200/300' },
-  { name: '都市', count: '98210', cover: 'https://picsum.photos/seed/mcat5/200/300' },
-  { name: '历史', count: '15210', cover: 'https://picsum.photos/seed/mcat6/200/300' },
-  { name: '军事', count: '7210', cover: 'https://picsum.photos/seed/mcat7/200/300' },
-  { name: '游戏', count: '23210', cover: 'https://picsum.photos/seed/mcat8/200/300' },
-];
+watch(activeGender, fetchCategories);
 
-const currentCategories = computed(() => {
-  return activeGender.value === '女生' ? femaleCategories : maleCategories;
+onMounted(() => {
+  nextTick(() => {
+    window.scrollTo(0, 0);
+  });
+  fetchCategories();
 });
 </script>

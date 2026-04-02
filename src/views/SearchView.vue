@@ -19,11 +19,11 @@
           <input 
             v-model="searchText" 
             type="text" 
-            placeholder="龙骑战机·热血爆燃" 
+            placeholder="输入书名或作者" 
             class="bg-transparent border-none outline-none text-sm w-full"
             @keyup.enter="handleSearch"
           />
-          <button v-if="searchText" @click="searchText = ''" class="ml-2">
+          <button v-if="searchText" @click="searchText = ''; isSearching = false" class="ml-2">
             <img src="/input_file_37.png" class="w-4 h-4 object-contain" alt="clear" />
           </button>
         </div>
@@ -33,53 +33,64 @@
 
     <!-- Content -->
     <main class="p-4">
+      <!-- Loading State -->
+      <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+        <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+        <p class="text-sm text-gray-400">正在搜索...</p>
+      </div>
+
       <!-- Search Results State -->
-      <div v-if="isSearching" class="space-y-6">
+      <div v-else-if="isSearching" class="space-y-6">
         <!-- Best Match -->
-        <div class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail')">
+        <div v-if="bestMatch" class="bg-white rounded-2xl p-4 shadow-sm cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail', bestMatch.id)">
           <div class="flex gap-4">
-            <img src="https://picsum.photos/seed/search1/200/300" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
+            <img :src="bestMatch.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
             <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
               <div>
-                <h3 class="text-base font-bold text-red-500 line-clamp-1 leading-tight">{{ searchText }}</h3>
-                <p class="text-sm text-gray-500 mt-2 line-clamp-1">修仙觅长生，热血任逍遥，踏莲曳波涤剑骨</p>
+                <h3 class="text-base font-bold text-red-500 line-clamp-1 leading-tight">{{ bestMatch.title }}</h3>
+                <p class="text-sm text-gray-500 mt-2 line-clamp-1">{{ bestMatch.desc }}</p>
               </div>
               <div class="flex items-center justify-between mt-2">
                 <div class="flex items-center gap-2 text-xs text-gray-400">
-                  <span>穿越</span>
+                  <span>{{ bestMatch.category }}</span>
                   <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                  <span>205万字</span>
+                  <span>{{ bestMatch.words }}</span>
                 </div>
-                <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">阅读156万</span>
+                <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">阅读{{ bestMatch.reads }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Other Results -->
-        <div>
+        <div v-if="otherResults.length > 0">
           <h2 class="text-lg font-bold mb-4">其他相关</h2>
           <div class="bg-white rounded-2xl p-4 shadow-sm space-y-8">
-            <div v-for="i in 4" :key="i" class="flex gap-4 cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail')">
-              <img :src="`https://picsum.photos/seed/search_res_${i}/200/300`" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
+            <div v-for="(book, index) in otherResults" :key="index" class="flex gap-4 cursor-pointer active:opacity-70" @click="$emit('navigate', 'bookDetail', book.id)">
+              <img :src="book.cover" class="w-20 h-28 object-cover rounded shadow-sm flex-shrink-0" referrerPolicy="no-referrer" />
               <div class="flex-1 flex flex-col justify-between py-1 overflow-hidden">
                 <div>
                   <h3 class="text-base font-bold line-clamp-1 leading-tight">
-                    <span class="text-red-500">{{ searchText }}</span>之从蓝日开始
+                    {{ book.title }}
                   </h3>
-                  <p class="text-sm text-gray-500 mt-2 line-clamp-1">行医第一方：让求医夫妻和离，震惊大宋。</p>
+                  <p class="text-sm text-gray-500 mt-2 line-clamp-1">{{ book.desc }}</p>
                 </div>
                 <div class="flex items-center justify-between mt-2">
                   <div class="flex items-center gap-2 text-xs text-gray-400">
-                    <span>穿越</span>
+                    <span>{{ book.category }}</span>
                     <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
-                    <span>205万字</span>
+                    <span>{{ book.words }}</span>
                   </div>
-                  <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">阅读156万</span>
+                  <span class="text-[10px] text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">阅读{{ book.reads }}</span>
                 </div>
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- No Results -->
+        <div v-if="!bestMatch && otherResults.length === 0" class="flex flex-col items-center justify-center py-20 text-gray-400">
+          <p>未找到相关书籍</p>
         </div>
       </div>
 
@@ -106,7 +117,7 @@
         </div>
 
         <!-- Recommended Search -->
-        <div>
+        <div v-if="recommendations.length > 0">
           <h2 class="text-lg font-bold mb-4">推荐搜索</h2>
           <div class="flex flex-wrap gap-3">
             <span 
@@ -120,66 +131,69 @@
             </span>
           </div>
         </div>
-
-        <!-- Hot Search List -->
-        <div class="bg-gradient-to-b from-[#FFF1F0] to-white rounded-2xl p-4 shadow-sm">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-lg font-bold text-[#FF4D4F]">热搜作品榜</h2>
-            <button class="text-sm text-gray-400 flex items-center">
-              更多 <img src="/input_file_0.png" class="w-4 h-4 object-contain ml-0.5" alt="arrow" />
-            </button>
-          </div>
-          <div class="space-y-6">
-            <div v-for="(item, index) in hotList" :key="index" class="flex items-center justify-between">
-              <div class="flex items-center gap-4">
-                <span 
-                  class="w-5 h-5 flex items-center justify-center rounded text-xs font-bold"
-                  :class="index < 3 ? 'bg-[#FF4D4F] text-white' : 'text-[#FF4D4F]'"
-                >
-                  {{ index + 1 }}
-                </span>
-                <span class="text-base font-medium text-gray-800 truncate max-w-[180px]">{{ item.name }}</span>
-              </div>
-              <div class="flex items-center gap-1 text-xs text-gray-400">
-                <img src="/input_file_10.png" class="w-3 h-3 object-contain" alt="hot" />
-                <span>{{ item.hot }}热度</span>
-              </div>
-            </div>
-          </div>
-          <div class="flex justify-center mt-6">
-            <img src="/input_file_1.png" class="w-6 h-6 object-contain bg-gray-100 rounded-full p-1" alt="expand" />
-          </div>
-        </div>
       </div>
     </main>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import { getHotSearch, searchNovels } from '../services/api';
 
 const emit = defineEmits(['back', 'navigate']);
 
 const searchText = ref('');
 const isSearching = ref(false);
-const history = ref(['遮天', '完美世界']);
-const recommendations = ['遮天', '完美世界', '四合院', '龙族', '海贼', '火影', '剑来', '很纯很暧昧'];
-const hotList = [
-  { name: '遮天', hot: '1.2w' },
-  { name: '完美世界', hot: '1680' },
-  { name: '火影', hot: '780' },
-  { name: '四合院', hot: '780' },
-  { name: '海贼', hot: '780' },
-  { name: '测试最长字段测试最长字...', hot: '780' },
-  { name: '很纯很暧昧', hot: '780' },
-];
+const loading = ref(false);
+const history = ref(JSON.parse(localStorage.getItem('searchHistory') || '[]'));
+const recommendations = ref([]);
+const bestMatch = ref(null);
+const otherResults = ref([]);
 
-const handleSearch = () => {
-  if (searchText.value.trim()) {
-    isSearching.value = true;
+const normalizeBook = (book) => {
+  if (!book) return null;
+  return {
+    id: book.articleid,
+    title: book.articlename,
+    cover: book.icon,
+    desc: book.intro,
+    author: book.author,
+    words: book.words ? `${(book.words / 10000).toFixed(1)}万字` : '未知',
+    category: book.type_txt || '其他',
+    reads: book.allvisit ? `${(book.allvisit / 10000).toFixed(1)}万` : '0'
+  };
+};
+
+const fetchHotSearch = async () => {
+  try {
+    const data = await getHotSearch();
+    recommendations.value = data;
+  } catch (error) {
+    console.error('Fetch hot search error:', error);
+  }
+};
+
+const handleSearch = async () => {
+  if (!searchText.value.trim()) return;
+  
+  loading.value = true;
+  isSearching.value = true;
+  
+  try {
+    const data = await searchNovels(searchText.value.trim());
+    bestMatch.value = normalizeBook(data.search);
+    otherResults.value = (data.other || []).map(normalizeBook);
+    
+    // Update history
     if (!history.value.includes(searchText.value)) {
       history.value.unshift(searchText.value);
+      if (history.value.length > 10) history.value.pop();
+      localStorage.setItem('searchHistory', JSON.stringify(history.value));
     }
+  } catch (error) {
+    console.error('Search error:', error);
+  } finally {
+    loading.value = false;
   }
 };
 
@@ -187,6 +201,8 @@ const handleCancel = () => {
   if (isSearching.value) {
     isSearching.value = false;
     searchText.value = '';
+    bestMatch.value = null;
+    otherResults.value = [];
   } else {
     emit('back');
   }
@@ -194,5 +210,8 @@ const handleCancel = () => {
 
 const clearHistory = () => {
   history.value = [];
+  localStorage.removeItem('searchHistory');
 };
+
+onMounted(fetchHotSearch);
 </script>

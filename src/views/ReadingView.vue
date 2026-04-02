@@ -14,7 +14,7 @@
         <button @click="$emit('back')" class="p-1">
           <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="back" />
         </button>
-        <h1 class="text-lg font-medium text-[#1A1A1A]">贵妃书斋</h1>
+        <h1 class="text-lg font-medium text-[#1A1A1A] truncate max-w-[60%]">{{ novelTitle }}</h1>
         <button class="p-1">
           <img src="/input_file_29.png" class="w-6 h-6 object-contain" alt="more" />
         </button>
@@ -23,44 +23,86 @@
 
     <!-- Reading Content -->
     <main 
-      class="flex-1 overflow-y-auto px-6 pt-20 pb-10"
+      ref="contentRef"
+      class="flex-1 pt-20 pb-10"
+      :class="[
+        pageMode === 'scroll' ? 'overflow-y-auto scroll-smooth px-6' : 'horizontal-read',
+        pageMode === 'slide' ? 'scroll-smooth' : ''
+      ]"
       :style="{ fontSize: fontSize + 'px', lineHeight: 1.8 }"
+      @scroll="handleScroll"
+      @click.stop="handleContentClick"
+      @touchstart="handleTouchStart"
+      @touchend="handleTouchEnd"
     >
-      <div class="max-w-2xl mx-auto">
-        <h2 class="text-center font-bold mb-10" :style="{ fontSize: (fontSize + 4) + 'px' }">
-          {{ chapterTitle }}
-        </h2>
-        
-        <div class="space-y-6">
-          <p v-for="(p, i) in content" :key="i" class="indent-8">
-            {{ p }}
-          </p>
+      <div :class="pageMode === 'scroll' ? 'max-w-2xl mx-auto' : 'h-full contents'">
+        <!-- Loading State (Initial) -->
+        <div v-if="loading && displayedChapters.length === 0" class="flex flex-col items-center justify-center py-20 gap-4">
+          <div class="w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+          <p class="text-sm text-gray-400">正在加载章节...</p>
         </div>
 
-        <!-- Paywall -->
-        <div v-if="isPaidChapter" class="mt-12 pt-12 border-t border-gray-200/30 text-center">
-          <p class="text-sm text-gray-400 mb-8">免费章节已阅读完毕，请购买本书后继续阅读</p>
-          <div class="space-y-4 px-4">
-            <button class="w-full py-4 bg-[#9FA8DA] text-white rounded-full font-medium shadow-sm active:opacity-90">
-              购买本书 <span class="text-xs opacity-80 ml-1">¥7 <del>¥57</del></span>
-            </button>
-            <button class="w-full py-4 bg-[#D1D9FF] text-[#7C4DFF] rounded-full font-medium active:opacity-90">
-              充值会员
-            </button>
+        <template v-else>
+          <div 
+            v-for="(chapter, index) in displayedChapters" 
+            :key="chapter.chapter.chapterid"
+            class="chapter-section"
+            :class="{ 'mb-20': pageMode === 'scroll' }"
+            :data-chapter-id="chapter.chapter.chapterid"
+          >
+            <h2 class="text-center font-bold mb-10" :style="{ fontSize: (fontSize + 4) + 'px' }">
+              {{ chapter.chapter.chaptername }}
+            </h2>
+            
+            <div class="space-y-6 whitespace-pre-wrap break-words">
+              {{ chapter.content }}
+            </div>
+
+            <!-- Paywall -->
+            <div v-if="chapter.need_buy" class="mt-12 pt-12 border-t border-gray-200/30 text-center">
+              <p class="text-sm text-gray-400 mb-8">本章为VIP章节，请购买后继续阅读</p>
+              <div class="space-y-4 px-4">
+                <button class="w-full py-4 bg-[#9FA8DA] text-white rounded-full font-medium shadow-sm active:opacity-90">
+                  购买本章 <span class="text-xs opacity-80 ml-1">{{ chapter.chapter.saleprice }} 阅币</span>
+                </button>
+                <button class="w-full py-4 bg-[#D1D9FF] text-[#7C4DFF] rounded-full font-medium active:opacity-90">
+                  充值会员
+                </button>
+              </div>
+              <p class="text-xs text-gray-400 mt-4">充值会员后所有书籍免费阅读</p>
+            </div>
+
+            <!-- Next Chapter Trigger (Invisible sentinel) -->
+            <div 
+              v-if="index === displayedChapters.length - 1 && nextChapterId && !chapter.need_buy" 
+              ref="loadMoreRef"
+              class="inline-block"
+              :class="pageMode === 'scroll' ? 'h-10 w-full' : 'h-full w-10'"
+            ></div>
           </div>
-          <p class="text-xs text-gray-400 mt-4">充值会员后所有书籍免费阅读</p>
-        </div>
+
+          <!-- Loading Next Chapter Indicator -->
+          <div v-if="loadingNext" class="flex flex-col items-center justify-center py-10 gap-2" :class="{ 'inline-flex h-full px-10': pageMode !== 'scroll' }">
+            <div class="w-6 h-6 border-2 border-[#7C4DFF] border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-xs text-gray-400">正在加载下一章...</p>
+          </div>
+          
+          <!-- End of Book -->
+          <div v-if="!nextChapterId && displayedChapters.length > 0" class="py-20 text-center text-gray-400 text-sm" :class="{ 'inline-block h-full px-20 pt-40': pageMode !== 'scroll' }">
+            - 已读完本书 -
+          </div>
+        </template>
       </div>
     </main>
 
     <!-- Floating Buttons -->
-    <div v-if="!showMenu" class="fixed right-4 bottom-24 flex flex-col gap-4 z-40">
+    <div v-if="showMenu" class="fixed right-4 bottom-72 flex flex-col gap-4 z-40">
       <button class="w-12 h-12 bg-white rounded-full shadow-lg flex flex-col items-center justify-center border border-gray-100 active:scale-95 transition-transform">
-        <img src="/input_file_54.png" class="w-5 h-5 object-contain" alt="listen" />
+        <img src="/vuesax_linear_music-play@2x.png" class="w-5 h-5 object-contain" alt="listen" />
         <span class="text-[8px] text-gray-400">听书</span>
       </button>
-      <button class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-100 active:scale-95 transition-transform">
-        <img src="/input_file_18.png" class="w-6 h-6 object-contain" alt="add" />
+      <button class="w-12 h-12 bg-white rounded-full shadow-lg flex items-center justify-center border border-gray-100 active:scale-95 transition-transform" @click.stop="triggerToast">
+        <img src="/vuesax_linear_music-play_1@2x.png" class="w-6 h-6 object-contain" alt="add" />
       </button>
     </div>
 
@@ -73,12 +115,20 @@
       >
         <!-- Progress Slider -->
         <div v-if="activeSubMenu === 'none'" class="flex items-center gap-4 mb-6">
-          <button class="text-sm text-gray-500">上一章</button>
+          <button 
+            class="text-sm text-gray-500 disabled:opacity-30" 
+            :disabled="!prevChapterId"
+            @click="goToChapter(prevChapterId)"
+          >上一章</button>
           <div class="flex-1 h-1 bg-gray-200 rounded-full relative">
-            <div class="absolute left-0 top-0 h-full bg-[#7C4DFF] rounded-full" style="width: 30%"></div>
-            <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#7C4DFF] rounded-full shadow-sm" style="left: 30%"></div>
+            <div class="absolute left-0 top-0 h-full bg-[#7C4DFF] rounded-full" :style="{ width: progress + '%' }"></div>
+            <div class="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white border-2 border-[#7C4DFF] rounded-full shadow-sm" :style="{ left: progress + '%' }"></div>
           </div>
-          <button class="text-sm text-gray-500">下一章</button>
+          <button 
+            class="text-sm text-gray-500 disabled:opacity-30" 
+            :disabled="!nextChapterId"
+            @click="goToChapter(nextChapterId)"
+          >下一章</button>
         </div>
 
         <!-- Brightness Slider -->
@@ -97,9 +147,9 @@
           <div class="flex items-center gap-4">
             <span class="text-sm text-gray-400 w-10">字号</span>
             <div class="flex-1 flex items-center justify-between bg-gray-50 rounded-full p-1">
-              <button @click="fontSize--" class="px-4 py-1 text-sm">A-</button>
+              <button @click="fontSize = Math.max(12, fontSize - 2)" class="px-4 py-1 text-sm">A-</button>
               <span class="text-sm font-medium">{{ fontSize }}</span>
-              <button @click="fontSize++" class="px-4 py-1 text-sm">A+</button>
+              <button @click="fontSize = Math.min(40, fontSize + 2)" class="px-4 py-1 text-sm">A+</button>
             </div>
           </div>
           <!-- Background -->
@@ -155,41 +205,362 @@
         已加入书架
       </div>
     </transition>
+
+    <!-- Catalog Popup -->
+    <transition name="slide-up">
+      <div v-if="showCatalogPopup" class="fixed inset-0 z-[60] flex flex-col">
+        <div class="absolute inset-0 bg-black/40" @click="showCatalogPopup = false"></div>
+        <div class="mt-auto h-[80vh] relative z-10">
+          <CatalogSheet 
+            :novel="novelData" 
+            :currentChapterId="currentChapterId"
+            @select="goToChapter" 
+          />
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue';
+import { getChapterContent, getNovelDetail } from '../services/api';
+import { ElMessage } from 'element-plus';
+import CatalogSheet from '../components/CatalogSheet.vue';
 
-const emit = defineEmits(['back', 'catalog']);
+const props = defineProps({
+  novelId: {
+    type: [String, Number],
+    required: true
+  },
+  chapterId: {
+    type: [String, Number],
+    required: true
+  }
+});
 
+const emit = defineEmits(['back', 'catalog', 'update-chapter']);
+
+const contentRef = ref(null);
+const loadMoreRef = ref(null);
 const showMenu = ref(false);
-const activeSubMenu = ref('none'); // 'none', 'brightness', 'settings'
+const activeSubMenu = ref('none');
 const showToast = ref(false);
+const loading = ref(false);
+const showCatalogPopup = ref(false);
 
-const fontSize = ref(18);
-const bgColor = ref('#FFFFFF');
+let observer = null;
+
+const setupObserver = () => {
+  if (observer) observer.disconnect();
+  
+  // In Vue 3, refs inside v-for are arrays. 
+  // We need the actual element (the first one since it's only rendered for the last item)
+  const target = Array.isArray(loadMoreRef.value) ? loadMoreRef.value[0] : loadMoreRef.value;
+
+  if (!target) return;
+
+  observer = new IntersectionObserver((entries) => {
+    const entry = entries[0];
+    // Only trigger if intersecting and NOT already loading
+    if (entry.isIntersecting && !loadingNext.value && nextChapterId.value) {
+      const nextId = nextChapterId.value;
+      if (!displayedChapters.value.some(c => Number(c.chapter.chapterid) === Number(nextId))) {
+        loadingNext.value = true;
+        fetchChapter(nextId, true);
+      }
+    }
+  }, {
+    root: null,
+    threshold: 0,
+    rootMargin: '100px' // Trigger when 100px from viewport
+  });
+
+  observer.observe(target);
+};
+
+watch(loadMoreRef, (newVal) => {
+  const el = Array.isArray(newVal) ? newVal[0] : newVal;
+  if (el) setupObserver();
+}, { deep: true });
+
+const fontSize = ref(Number(localStorage.getItem('reading-font-size')) || 18);
+const bgColor = ref(localStorage.getItem('reading-bg-color') || '#FFFFFF');
 const brightness = ref(30);
 const pageMode = ref('scroll');
 const isDarkMode = ref(false);
 
-const chapterTitle = '苟在妖武乱世修仙';
-const content = [
-  '“拒绝了？”',
-  '方夕脸色有些难看地瞪着阿福。',
-  '阿福低着头，满是忐忑：“老奴耗费重金，找了中人，也承诺可以再加钱，奈何……”',
-  '方夕深深呼吸了一口气。',
-  '作为修仙者，他何时受过这种屈辱？',
-  '……好吧，在青竹山坊市经常受这种屈辱，都特么快习惯了。',
-  '习惯就好，习惯就好啊。',
-  '“罢了，想来是我资质一般，别人看不上眼。”',
-  '他耸耸肩膀。',
-  '作为修仙者，哪怕是最低层次，耳聪目明，过目不忘的本事还是有的。',
-  '习惯就好，习惯就好啊。',
-  '“罢了，想来是我资质一般，别人看不上眼。”',
-];
+const novelData = ref(null);
+const novelTitle = ref('');
+const displayedChapters = ref([]);
+const chapterList = ref([]);
+const loadingNext = ref(false);
 
-const isPaidChapter = ref(true);
+const currentChapterId = ref(Number(props.chapterId));
+
+const currentChapterIndex = computed(() => {
+  if (!chapterList.value.length || !currentChapterId.value) return -1;
+  return chapterList.value.findIndex(c => c.chapterid === Number(currentChapterId.value));
+});
+
+const prevChapterId = computed(() => {
+  const index = currentChapterIndex.value;
+  if (index > 0) return chapterList.value[index - 1].chapterid;
+  return null;
+});
+
+const nextChapterId = computed(() => {
+  if (!chapterList.value.length || displayedChapters.value.length === 0) return null;
+  
+  const lastChapter = displayedChapters.value[displayedChapters.value.length - 1];
+  if (!lastChapter || !lastChapter.chapter) return null;
+  
+  const lastId = Number(lastChapter.chapter.chapterid);
+  const index = chapterList.value.findIndex(c => Number(c.chapterid) === lastId);
+  
+  if (index >= 0 && index < chapterList.value.length - 1) {
+    return chapterList.value[index + 1].chapterid;
+  }
+  return null;
+});
+
+const progress = computed(() => {
+  if (!chapterList.value.length || currentChapterIndex.value === -1) return 0;
+  return ((currentChapterIndex.value + 1) / chapterList.value.length) * 100;
+});
+
+const fetchNovelInfo = async () => {
+  try {
+    const data = await getNovelDetail(props.novelId);
+    novelData.value = data;
+    novelTitle.value = data.articlename;
+    chapterList.value = data.chapter || [];
+  } catch (error) {
+    console.error('Fetch novel info error:', error);
+  }
+};
+
+const chapterCache = new Map();
+
+const fetchChapter = async (cid, isAppend = false) => {
+  if (chapterCache.has(cid)) {
+    const data = chapterCache.get(cid);
+    if (isAppend) {
+      displayedChapters.value.push(data);
+    } else {
+      displayedChapters.value = [data];
+    }
+    loading.value = false;
+    loadingNext.value = false;
+    return;
+  }
+
+  try {
+    const data = await getChapterContent(props.novelId, cid);
+    chapterCache.set(cid, data);
+    if (isAppend) {
+      displayedChapters.value.push(data);
+    } else {
+      displayedChapters.value = [data];
+    }
+  } catch (error) {
+    console.error('Fetch chapter error:', error);
+    ElMessage.error('获取章节内容失败');
+  } finally {
+    loading.value = false;
+    loadingNext.value = false;
+  }
+};
+
+const checkAutoLoad = () => {
+  if (!contentRef.value || loadingNext.value || !nextChapterId.value) return;
+  
+  const scroller = contentRef.value;
+  
+  if (pageMode.value === 'scroll') {
+    const scrollBottom = scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+    if (scrollBottom < 100) {
+      const nextId = nextChapterId.value;
+      if (!displayedChapters.value.some(c => Number(c.chapter.chapterid) === Number(nextId))) {
+        loadingNext.value = true;
+        fetchChapter(nextId, true);
+      }
+    }
+  } else {
+    // Horizontal check
+    const scrollRight = scroller.scrollWidth - scroller.scrollLeft - scroller.clientWidth;
+    if (scrollRight < 100) {
+      const nextId = nextChapterId.value;
+      if (!displayedChapters.value.some(c => Number(c.chapter.chapterid) === Number(nextId))) {
+        loadingNext.value = true;
+        fetchChapter(nextId, true);
+      }
+    }
+  }
+};
+
+const goToChapter = async (cid) => {
+  if (!cid) return;
+  
+  loading.value = true;
+  showMenu.value = false;
+  showCatalogPopup.value = false;
+  currentChapterId.value = Number(cid);
+  
+  await fetchChapter(cid, false);
+  
+  emit('update-chapter', cid);
+  
+  if (contentRef.value) {
+    if (pageMode.value === 'scroll') {
+      contentRef.value.scrollTop = 0;
+    } else {
+      contentRef.value.scrollLeft = 0;
+    }
+  }
+};
+
+const handleScroll = () => {
+  if (!contentRef.value) return;
+  updateActiveChapter();
+  checkAutoLoad();
+};
+
+const toggleMenu = () => {
+  showMenu.value = !showMenu.value;
+  if (!showMenu.value) activeSubMenu.value = 'none';
+};
+
+const handleContentClick = (e) => {
+  if (showMenu.value) {
+    showMenu.value = false;
+    activeSubMenu.value = 'none';
+    return;
+  }
+  
+  const x = e.clientX;
+  const y = e.clientY;
+  const w = window.innerWidth;
+  const h = window.innerHeight;
+  
+  // Check if click is in the center 3x3 cell (5th cell)
+  const isInCenter = x > w / 3 && x < (w * 2) / 3 && y > h / 3 && y < (h * 2) / 3;
+  
+  if (isInCenter) {
+    toggleMenu();
+  } else {
+    // All other areas trigger pagination
+    if (x < w / 2) {
+      prevPage();
+    } else {
+      nextPage();
+    }
+  }
+};
+
+const nextPage = () => {
+  if (!contentRef.value) return;
+  const scroller = contentRef.value;
+  
+  if (pageMode.value === 'scroll') {
+    const targetScroll = scroller.scrollTop + scroller.clientHeight - 40;
+    scroller.scrollTop = targetScroll;
+  } else {
+    // Horizontal page turn
+    const targetScroll = scroller.scrollLeft + scroller.clientWidth;
+    scroller.scrollLeft = targetScroll;
+  }
+  
+  // Check if we need to load more
+  setTimeout(() => {
+    checkAutoLoad();
+    updateActiveChapter();
+  }, 350);
+};
+
+const prevPage = () => {
+  if (!contentRef.value) return;
+  const scroller = contentRef.value;
+  
+  if (pageMode.value === 'scroll') {
+    const targetScroll = Math.max(0, scroller.scrollTop - scroller.clientHeight + 40);
+    scroller.scrollTop = targetScroll;
+  } else {
+    // Horizontal page turn
+    const targetScroll = Math.max(0, scroller.scrollLeft - scroller.clientWidth);
+    scroller.scrollLeft = targetScroll;
+  }
+  
+  setTimeout(updateActiveChapter, 350);
+};
+
+const updateActiveChapter = () => {
+  if (!contentRef.value) return;
+  const sections = contentRef.value.querySelectorAll('.chapter-section');
+  let activeId = currentChapterId.value;
+  
+  sections.forEach(section => {
+    const rect = section.getBoundingClientRect();
+    if (pageMode.value === 'scroll') {
+      if (rect.top < window.innerHeight / 2) {
+        activeId = Number(section.getAttribute('data-chapter-id'));
+      }
+    } else {
+      // Horizontal check: if the section is visible in the viewport
+      if (rect.left < window.innerWidth / 2 && rect.right > window.innerWidth / 2) {
+        activeId = Number(section.getAttribute('data-chapter-id'));
+      }
+    }
+  });
+  
+  if (Number(activeId) !== Number(currentChapterId.value)) {
+    currentChapterId.value = activeId;
+    emit('update-chapter', activeId);
+  }
+};
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+const handleTouchStart = (e) => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+};
+
+const handleTouchEnd = (e) => {
+  if (pageMode.value === 'scroll') return;
+  
+  const touchEndX = e.changedTouches[0].clientX;
+  const touchEndY = e.changedTouches[0].clientY;
+  
+  const dx = touchEndX - touchStartX;
+  const dy = touchEndY - touchStartY;
+  
+  // Horizontal swipe
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 30) {
+    if (dx < 0) {
+      nextPage();
+    } else {
+      prevPage();
+    }
+  }
+};
+
+const handleTabClick = (id) => {
+  if (id === 'catalog') {
+    showCatalogPopup.value = true;
+    showMenu.value = false;
+  } else if (id === 'mode') {
+    isDarkMode.value = !isDarkMode.value;
+  } else {
+    activeSubMenu.value = activeSubMenu.value === id ? 'none' : id;
+  }
+};
+
+const triggerToast = () => {
+  showToast.value = true;
+  setTimeout(() => showToast.value = false, 2000);
+};
 
 const bgOptions = [
   { color: '#FFFFFF' },
@@ -203,7 +574,6 @@ const pageModes = [
   { label: '上下', value: 'scroll' },
   { label: '平移', value: 'slide' },
   { label: '无', value: 'none' },
-  { label: '翻页', value: 'flip' },
 ];
 
 const tabs = computed(() => [
@@ -216,26 +586,33 @@ const tabs = computed(() => [
 const currentBgColor = computed(() => isDarkMode.value ? '#121212' : bgColor.value);
 const textColor = computed(() => isDarkMode.value ? '#999' : '#1A1A1A');
 
-const toggleMenu = () => {
-  showMenu.value = !showMenu.value;
-  if (!showMenu.value) activeSubMenu.value = 'none';
-};
+watch(fontSize, (val) => localStorage.setItem('reading-font-size', val));
+watch(bgColor, (val) => localStorage.setItem('reading-bg-color', val));
 
-const handleTabClick = (id) => {
-  if (id === 'catalog') {
-    emit('catalog');
-    showMenu.value = false;
-  } else if (id === 'mode') {
-    isDarkMode.value = !isDarkMode.value;
-  } else {
-    activeSubMenu.value = activeSubMenu.value === id ? 'none' : id;
+onMounted(async () => {
+  loading.value = true;
+  await fetchNovelInfo();
+  await fetchChapter(props.chapterId, false);
+  nextTick(() => {
+    if (contentRef.value) {
+      if (pageMode.value === 'scroll') {
+        contentRef.value.scrollTop = 0;
+      } else {
+        contentRef.value.scrollLeft = 0;
+      }
+    }
+  });
+});
+
+onUnmounted(() => {
+  if (observer) observer.disconnect();
+});
+
+watch(() => props.chapterId, (newId) => {
+  if (Number(currentChapterId.value) !== Number(newId)) {
+    goToChapter(newId);
   }
-};
-
-const triggerToast = () => {
-  showToast.value = true;
-  setTimeout(() => showToast.value = false, 2000);
-};
+});
 </script>
 
 <style scoped>
@@ -253,18 +630,35 @@ const triggerToast = () => {
   transform: translateY(-100%);
 }
 
-.slide-left-enter-active, .slide-left-leave-active {
-  transition: transform 0.3s ease;
-}
-.slide-left-enter-from, .slide-left-leave-to {
-  transform: translateX(-100%);
-}
-
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+.horizontal-read {
+  display: block;
+  column-width: 100vw;
+  column-gap: 0;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: normal;
+  padding: 0 24px;
+}
+
+.horizontal-read .chapter-section {
+  display: block;
+  width: auto;
+  height: 100%;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .indent-8 {
