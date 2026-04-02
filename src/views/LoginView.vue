@@ -133,12 +133,12 @@
 
         <!-- Agreement -->
         <div class="mt-auto mb-8 flex items-start gap-2 px-4">
-            <button 
-            class="mt-0.5 w-4 h-4 rounded-full border flex items-center justify-center transition-colors"
-            :class="agreed ? 'bg-[#4CAF50] border-[#4CAF50]' : 'border-gray-300'"
+          <button 
+            class="mt-0.5 w-4 h-4 rounded-full flex items-center justify-center transition-colors"
+            :class="agreed ? '' : 'bg-gray-100'"
             @click="agreed = !agreed"
           >
-            <img v-if="agreed" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
+            <img v-if="agreed" src="/input_file_5.png" class="w-5 h-5 object-contain" alt="check" />
           </button>
           <p class="text-xs text-gray-400 leading-relaxed">
             请您阅读并同意“贵妃书斋用户协议”和“隐私政策”

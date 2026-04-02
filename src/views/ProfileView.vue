@@ -2,7 +2,7 @@
   <div class="min-h-screen bg-[#F8F9FA] pb-20 font-sans text-[#333]">
     <!-- Header -->
     <header class="sticky top-0 z-10 bg-white px-4 pt-4 pb-2 flex items-center justify-between">
-      <button class="p-1">
+      <button class="p-1" @click="$emit('back')">
         <img src="/input_file_37.png" class="w-6 h-6 object-contain" alt="close" />
       </button>
       <h1 class="text-lg font-bold text-[#1A1A1A]">贵妃书斋</h1>
@@ -12,9 +12,9 @@
     </header>
 
     <!-- User Info Section -->
-    <div class="bg-white px-4 pt-6 pb-8 relative">
-      <button v-if="isLoggedIn" class="absolute top-2 right-4 p-1" @click="$emit('navigate', 'profileSettings')">
-        <img src="/input_file_17.png" class="w-6 h-6 object-contain" alt="settings" />
+    <div class="bg-gradient-to-b from-[#EEEBFE] to-[#F4F3F8] px-4 pt-8 pb-16 relative">
+      <button v-if="isLoggedIn" class="absolute top-4 right-4 p-1" @click="$emit('navigate', 'profileSettings')">
+        <img src="/setting@2x.png" class="w-6 h-6 object-contain" alt="settings" />
       </button>
       
       <div class="flex items-center justify-between">
@@ -25,31 +25,31 @@
           </div>
           <div>
             <h2 class="text-xl font-bold text-[#1A1A1A]">{{ isLoggedIn ? (userData?.name || userData?.uname || '用户·笔趣阁') : '未登录' }}</h2>
-            <p class="text-sm text-gray-400 mt-0.5">{{ isLoggedIn ? `ID: ${userData?.uid || '91283192'}` : '点击登录/注册' }}</p>
+            <p class="text-sm text-gray-400 mt-0.5">{{ isLoggedIn ? (userData?.phone || '138 **** 1954') : '点击登录/注册' }}</p>
           </div>
         </div>
         <button v-if="isLoggedIn" class="flex items-center gap-1 text-sm text-gray-400" @click="$emit('navigate', 'profileSettings')">
           个人主页
-          <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
+          <img src="/input_file_0.png" class="w-4 h-4 object-contain opacity-40" alt="arrow" />
         </button>
       </div>
     </div>
 
     <!-- Membership Card -->
-    <div class="px-4 -mt-4">
-      <div class="bg-[#F3EFFF] rounded-2xl p-5 flex items-center justify-between shadow-sm">
+    <div class="px-4 -mt-10 relative z-10">
+      <div class="bg-[#F6F0F7] rounded-2xl p-6 flex items-center justify-between shadow-md min-h-[100px] border-[1px] border-[#fffefe]">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 bg-[#D1C4E9] rounded-xl flex items-center justify-center shadow-inner">
-            <img src="/input_file_33.png" class="w-7 h-7 object-contain" alt="crown" />
+          <div class="w-14 h-14 flex-shrink-0">
+            <img src="/矩形 242@2x.png" class="w-full h-full object-contain" alt="crown" />
           </div>
           <div>
-            <h3 class="font-bold text-[#5E35B1] text-lg">开通贵妃会员卡</h3>
-            <p class="text-xs text-[#7E57C2] mt-1">开通后平台所有书籍免费阅读</p>
+            <h3 class="font-bold text-[#1A1A1A] text-lg">开通贵妃会员卡</h3>
+            <p class="text-xs text-gray-400 mt-1">开通后平台所有书籍免费阅读</p>
           </div>
         </div>
-        <button class="flex items-center gap-0.5 text-[#5E35B1] font-bold text-sm">
-          立即开通
-          <img src="/input_file_3.png" class="w-4 h-4 object-contain" alt="arrow" />
+        <button class="flex items-center gap-0.5 text-[#7C4DFF] font-bold text-sm">
+          立刻开通
+          <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
         </button>
       </div>
     </div>
@@ -61,7 +61,7 @@
           <h2 class="text-xl font-bold text-[#1A1A1A]">猜你喜欢</h2>
           <button class="flex items-center gap-0.5 text-sm text-gray-400">
             更多
-            <img src="/input_file_0.png" class="w-4 h-4 object-contain" alt="arrow" />
+            <img src="/input_file_0.png" class="w-4 h-4 object-contain opacity-40" alt="arrow" />
           </button>
         </div>
 

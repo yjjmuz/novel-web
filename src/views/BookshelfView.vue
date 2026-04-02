@@ -76,10 +76,10 @@
                 class="absolute inset-0 bg-black/5 flex items-start justify-end p-1.5"
               >
                 <div 
-                  class="w-5 h-5 rounded-full border flex items-center justify-center transition-colors"
-                  :class="selectedIds.includes(book.id) ? 'bg-[#7C4DFF] border-[#7C4DFF]' : 'bg-white/80 border-gray-300'"
+                  class="w-5 h-5 rounded-full flex items-center justify-center transition-colors"
+                  :class="selectedIds.includes(book.id) ? 'bg-[#7C4DFF]' : 'bg-white/80'"
                 >
-                  <img v-if="selectedIds.includes(book.id)" src="/input_file_5.png" class="w-3 h-3 object-contain" alt="check" />
+                  <img v-if="selectedIds.includes(book.id)" src="/input_file_5.png" class="w-5 h-5 object-contain" alt="check" />
                 </div>
               </div>
             </div>
